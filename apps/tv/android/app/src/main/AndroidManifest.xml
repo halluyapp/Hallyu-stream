@@ -10,6 +10,7 @@
   <application
     android:name=".MainApplication"
     android:allowBackup="false"
+    android:banner="@drawable/tv_banner"
     android:theme="@style/AppTheme"
     android:usesCleartextTraffic="false"
     android:supportsRtl="true">

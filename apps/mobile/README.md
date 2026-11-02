@@ -36,6 +36,20 @@ npm run android                    # requires Android SDK + Java
 - Progress is keyed by `subjectId|se|ep`.
 - Pairing is only real when the Supabase Edge Function confirms it.
 
+## GitHub Actions APK
+
+The root workflow `.github/workflows/build-apk.yml` builds this app in CI:
+
+```bash
+npm ci
+npm ci --prefix apps/mobile
+cd apps/mobile && CI=1 npx expo prebuild --platform android --clean
+cd android && ./gradlew assembleDebug
+cd android && ./gradlew assembleRelease -Pandroid.injected.signing.store.file=... # CI supplies these
+```
+
+Debug and release APKs are uploaded as workflow artifacts. Release signing uses an ephemeral runner key; use a real production keystore for distribution.
+
 ## Not verified here
 
-This sandbox has no Java/Android SDK, so no APK was built. Physical-device checks (camera permission, low-RAM performance, CDN playback with custom headers) remain on the QA matrix in `10-NFR_AND_TESTING.md`.
+This sandbox has no Java/Android SDK, so no APK was built locally and no CI artifact is claimed yet. Physical-device checks (camera permission, low-RAM performance, CDN playback with custom headers) remain on the QA matrix in `10-NFR_AND_TESTING.md`.

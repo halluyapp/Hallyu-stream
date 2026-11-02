@@ -2,12 +2,20 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+// react-native-config: reads apps/tv/.env at build time (SUPABASE_URL, etc.).
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+
+/**
+ * Optional CI signing. When HALLYU_SIGNING_* env vars are absent the release
+ * APK is left unsigned, which is fine for a debug/preview artifact.
+ */
+def hallyuStoreFile = System.getenv("HALLYU_SIGNING_STORE_FILE")
+def hallyuStorePassword = System.getenv("HALLYU_SIGNING_STORE_PASSWORD")
+def hallyuKeyAlias = System.getenv("HALLYU_SIGNING_KEY_ALIAS")
+def hallyuKeyPassword = System.getenv("HALLYU_SIGNING_KEY_PASSWORD")
+
 react {
-  root = file("../../")
-  reactNativeDir = file("../../node_modules/react-native")
-  codegenDir = file("../../node_modules/@react-native/codegen")
-  cliFile = file("../../node_modules/react-native/cli.js")
-  hermesCommand = "../../node_modules/react-native/sdks/hermesc/%OS-BIN%/hermesc"
+  autolinkLibrariesWithApp()
 }
 
 def enableProguardInReleaseBuilds = false
@@ -15,8 +23,15 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
   namespace "com.hallyu.stream.tv"
-  compileSdk rootProject.ext.compileSdkVersion
+  ndkVersion rootProject.ext.ndkVersion
   buildToolsVersion rootProject.ext.buildToolsVersion
+  compileSdk rootProject.ext.compileSdkVersion
+
+  // AGP 8 no longer generates BuildConfig by default. The RN host and
+  // react-native-config dotenv.gradle both rely on BuildConfig fields.
+  buildFeatures {
+    buildConfig = true
+  }
 
   defaultConfig {
     applicationId "com.hallyu.stream.tv"
@@ -24,13 +39,29 @@ android {
     targetSdkVersion rootProject.ext.targetSdkVersion
     versionCode 1
     versionName "0.1.0"
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", newArchEnabled.toBoolean().toString()
+    buildConfigField "boolean", "IS_HERMES_ENABLED", hermesEnabled.toBoolean().toString()
+  }
+
+  signingConfigs {
+    release {
+      if (hallyuStoreFile) {
+        storeFile file(hallyuStoreFile)
+        storePassword hallyuStorePassword
+        keyAlias hallyuKeyAlias
+        keyPassword hallyuKeyPassword
+      }
+    }
   }
 
   buildTypes {
     debug {
-      // No debug keystore is committed. Android Studio generates one for local builds.
+      // Android Gradle Plugin signs debug builds with the auto-generated debug key.
     }
     release {
+      if (hallyuStoreFile) {
+        signingConfig signingConfigs.release
+      }
       minifyEnabled enableProguardInReleaseBuilds
       proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
     }
@@ -48,5 +79,3 @@ dependencies {
     implementation jscFlavor
   }
 }
-
-apply from: file("../../node_modules/@react-native/gradle-plugin/autolinking.gradle")

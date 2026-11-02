@@ -55,12 +55,43 @@ npm run typecheck           # TS strict check across shared + ui + preview
 npm run preview             # starts the browser review harness on 0.0.0.0:5173
 npm run build:preview
 
-# Native clients have their own package.json (not installed in this sandbox):
-cd apps/mobile && npm install && npm run android
-cd apps/tv     && npm install && npm run android
+# Native clients have their own package.json + lockfile:
+cd apps/mobile && npm ci && npm run android
+cd apps/tv     && npm ci && npm run android
 ```
 
-Native builds require a local Android SDK/NDK and Java. This sandbox has **no Java/Android SDK**, so APKs are not built or claimed here; the source, manifests, and build configs are provided.
+Native builds require a local Android SDK/NDK and Java. The TV app aliases `react-native` to `react-native-tvos`, so install it with `NPM_CONFIG_LEGACY_PEER_DEPS=true` (the CI workflow already sets this). This sandbox has **no Java/Android SDK**, so APKs are not built or claimed here; the source, manifests, and build configs are provided.
+
+---
+
+## APK builds via GitHub Actions
+
+`.github/workflows/build-apk.yml` is the release-build automation. It runs on pushes to `arena/69ba68a7-hallyu-stream`, on `v*` tag pushes, on PRs to `main`, and on manual `workflow_dispatch`.
+
+Jobs:
+
+1. `verify` — strict TypeScript check, shared-layer smoke test, and production build of the review harness.
+2. `build-mobile-apk` — installs the phone project, runs `expo prebuild --platform android --clean`, then builds debug + release APKs with Gradle.
+3. `build-tv-apk` — installs the TV project, writes a build-time `.env`, then builds debug + release APKs from the checked-in `android/` project.
+4. `release` — only on `refs/tags/v*`, attaches all downloaded APKs to a GitHub Release.
+
+Artifacts are uploaded as `hallyu-stream-mobile-apk-<sha>` and `hallyu-stream-tv-apk-<sha>` (14-day retention). Release APKs are signed with an ephemeral CI key generated on the runner; **replace this with a real production keystore before store distribution**. No keystore or secret is committed.
+
+Optional GitHub Actions repository variables (not secrets) supply build-time config without hardcoding endpoints:
+
+| Variable | Used by |
+|---|---|
+| `EXPO_PUBLIC_SUPABASE_URL` | phone, TV fallback |
+| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | phone, TV fallback |
+| `EXPO_PUBLIC_PAIRING_CLIENT_KEY` | phone, TV fallback |
+| `EXPO_PUBLIC_ZAR_BASE_URL` | phone, TV fallback |
+| `EXPO_PUBLIC_MOVIE_SEASON` / `EXPO_PUBLIC_MOVIE_EPISODE` | phone, TV fallback |
+| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` / `PAIRING_CLIENT_KEY` | TV native `.env` |
+| `ZAR_BASE_URL` / `MOVIE_SEASON` / `MOVIE_EPISODE` | TV native `.env` |
+
+Missing variables fall back to empty strings / `0`, so the APK still builds while pairing correctly reports an unconfigured backend. See `.github/workflows/README.md` for the exact CI commands and notes.
+
+**Status:** the workflow YAML is validated locally. No GitHub Actions run has completed yet, so no APK artifact is claimed. Check the repository’s Actions tab after the first push.
 
 ---
 
@@ -90,7 +121,7 @@ No service-role key, DB password, or signed media URL is ever placed in client c
 | 6 Library + downloads + offline | Local store done; device download manager planned |
 | 7 Pairing backend + QR + revoke | **Backend source written; deployment blocked — see below** |
 | 8 Motion polish + performance pass | Planned |
-| 9 QA matrix + release builds | Blocked on hardware/Android SDK |
+| 9 QA matrix + release builds | **CI workflow added; APK artifacts pending first successful GitHub Actions run** |
 
 ### Blocker: Supabase project creation
 
@@ -100,9 +131,9 @@ No service-role key, DB password, or signed media URL is ever placed in client c
 
 ### Verified vs assumed
 
-- **Verified:** repository contents, tooling availability, Supabase org/project list, free-limit refusal, TypeScript strictness of the shared layer.
-- **Assumed / unverified:** live `zarhosting` response shapes (normalisers are defensive), live CDN playback, physical low-RAM phone behaviour, Android TV focus on hardware, QR camera permission flow on device. The spec’s own Appendix D lists these as open items.
-- **Not claimed:** any APK, any real playback, any successful pairing, any provider smoke test from this sandbox (outbound network here is restricted to package registries/GitHub).
+- **Verified:** repository contents, tooling availability, Supabase org/project list, free-limit refusal, TypeScript strictness of the shared layer, preview production build, offline smoke test, and local validation of the GitHub Actions workflow YAML.
+- **Assumed / unverified:** live `zarhosting` response shapes (normalisers are defensive), live CDN playback, physical low-RAM phone behaviour, Android TV focus on hardware, QR camera permission flow on device, and a successful first GitHub Actions APK build. The spec’s own Appendix D lists hardware items as open.
+- **Not claimed:** any APK artifact yet, any real playback, any successful pairing, any provider smoke test from this sandbox (outbound network here is restricted to package registries/GitHub).
 
 ---
 
