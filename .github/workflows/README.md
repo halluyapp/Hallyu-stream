@@ -1,6 +1,8 @@
 # GitHub Actions — Android APK builds
 
-`build-apk.yml` is the only Android workflow in this repository. It produces installable debug and release APKs for both native clients without requiring a local Android SDK. The earlier `main` workflow `android.yml` and its `mobile/` app were removed during consolidation; there is no longer a second, conflicting "Build Android APK" job.
+`build-apk.yml` is the only **Android build** workflow in this repository. It produces installable debug and release APKs for both native clients without requiring a local Android SDK. The earlier `main` workflow `android.yml` and its `mobile/` app were removed during consolidation; there is no longer a second, conflicting "Build Android APK" job.
+
+`publish-release.yml` is a small release helper, not another build: it can attach already-uploaded phone/TV APK artifacts from a specified Actions run to an existing tag via `repository_dispatch` or `workflow_dispatch`.
 
 ## Triggers
 
@@ -19,7 +21,20 @@ hallyu-stream-phone-debug.apk    hallyu-stream-phone-release.apk
 hallyu-stream-tv-debug.apk       hallyu-stream-tv-release.apk
 ```
 
-Both Gradle projects otherwise produce `app-debug.apk` / `app-release.apk`; with `merge-multiple: true` in the release job those identical names would overwrite each other and only one client's APKs would reach the Release.
+Both Gradle projects otherwise produce `app-debug.apk` / `app-release.apk`; with `merge-multiple: true` in the release job those identical names would overwrite each other and only one client's APKs would reach the Release. The first `v0.1.0` tag demonstrated exactly that, so its release and tag were deleted; `v0.1.1` carries all four correctly named assets.
+
+## Publishing from an existing run
+
+If a tag build completes its APK jobs but its `release` step is interrupted, `publish-release.yml` can publish those already-uploaded artifacts without another 18-minute Gradle build:
+
+```bash
+gh api -X POST repos/halluyapp/hallyu-stream/dispatches \
+  -f event_type=publish-apks \
+  -F client_payload[run_id]=41519431805 \
+  -F client_payload[tag]=v0.1.1
+```
+
+It downloads `hallyu-stream-*-apk-*` from that run, verifies `.apk` files exist, then calls `softprops/action-gh-release@v2` with `contents: write`. This is how the [v0.1.1 Release](https://github.com/halluyapp/hallyu-stream/releases/tag/v0.1.1) was published after the `v0.1.1` tag run was cancelled.
 
 ## What each job does
 
@@ -71,5 +86,6 @@ Phone reads `EXPO_PUBLIC_*` at Expo prebuild/bundle time. TV reads `SUPABASE_URL
 - Root strict typecheck, smoke test, and preview production build pass locally.
 - GitHub Actions [run 41509904497](https://github.com/halluyapp/hallyu-stream/actions/runs/41509904497) completed successfully on `68f2f75`, uploading debug + release APK artifacts for both phone and TV clients.
 - GitHub Actions [run 41514853664](https://github.com/halluyapp/hallyu-stream/actions/runs/41514853664) completed successfully on `ca03757` after a clean push-triggered re-run: `verify`, `build-mobile-apk` and `build-tv-apk` all passed.
+- GitHub Actions [run 41521621257](https://github.com/halluyapp/hallyu-stream/actions/runs/41521621257) successfully published the four corrected `.apk` assets to the `v0.1.1` Release.
 
 No Android build has run in this sandbox (no Java / Android SDK); APKs are produced exclusively by the GitHub Actions runner. The artifacts are CI builds, not store-ready signed releases.
