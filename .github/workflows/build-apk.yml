@@ -167,7 +167,10 @@ jobs:
       - name: Collect phone APKs
         run: |
           mkdir -p artifacts/mobile
-          find apps/mobile/android/app/build/outputs/apk -name '*.apk' -exec cp {} artifacts/mobile/ \;
+          find apps/mobile/android/app/build/outputs/apk -name 'app-debug.apk' -exec cp {} artifacts/mobile/hallyu-stream-phone-debug.apk \;
+          find apps/mobile/android/app/build/outputs/apk -name 'app-release.apk' -exec cp {} artifacts/mobile/hallyu-stream-phone-release.apk \;
+          test -f artifacts/mobile/hallyu-stream-phone-debug.apk
+          test -f artifacts/mobile/hallyu-stream-phone-release.apk
           ls -lh artifacts/mobile
 
       - uses: actions/upload-artifact@v4
@@ -253,7 +256,10 @@ jobs:
       - name: Collect TV APKs
         run: |
           mkdir -p artifacts/tv
-          find apps/tv/android/app/build/outputs/apk -name '*.apk' -exec cp {} artifacts/tv/ \;
+          find apps/tv/android/app/build/outputs/apk -name 'app-debug.apk' -exec cp {} artifacts/tv/hallyu-stream-tv-debug.apk \;
+          find apps/tv/android/app/build/outputs/apk -name 'app-release.apk' -exec cp {} artifacts/tv/hallyu-stream-tv-release.apk \;
+          test -f artifacts/tv/hallyu-stream-tv-debug.apk
+          test -f artifacts/tv/hallyu-stream-tv-release.apk
           ls -lh artifacts/tv
 
       - uses: actions/upload-artifact@v4
