@@ -16,6 +16,7 @@
     "@hallyu/ui": "file:../../packages/ui",
     "@react-native-async-storage/async-storage": "2.1.0",
     "expo": "~52.0.0",
+    "expo-asset": "11.0.5",
     "expo-camera": "~16.0.0",
     "expo-file-system": "~18.0.0",
     "expo-font": "~13.0.0",
