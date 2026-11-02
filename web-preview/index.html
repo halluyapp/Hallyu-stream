@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HALLYU-STREAM — Interface Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="nocturne.css" />
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">The Screening Room · Interface Preview</div>
+  <h1 class="wordmark">HALLYU<em>—</em>STREAM</h1>
+  <p class="tagline">
+    A React Native client for Korean drama and film. <b>One APK, two experiences</b> —
+    a touch app for phones and tablets, and a ten-foot navigator for Android TV.
+    Everything below is rendered from the same NOCTURNE tokens that ship in
+    <b>mobile/src/theme/index.tsx</b>.
+  </p>
+  <div class="switcher" role="tablist">
+    <button class="sw" role="tab" aria-selected="true" data-panel="p-home">Phone · Home</button>
+    <button class="sw" role="tab" aria-selected="false" data-panel="p-detail">Phone · Detail</button>
+    <button class="sw" role="tab" aria-selected="false" data-panel="p-player">Phone · Player</button>
+    <button class="sw" role="tab" aria-selected="false" data-panel="p-pair">Phone · Pairing</button>
+    <button class="sw" role="tab" aria-selected="false" data-panel="p-tv">Android TV · Home</button>
+    <button class="sw" role="tab" aria-selected="false" data-panel="p-tvact">Android TV · Activation</button>
+    <button class="sw" role="tab" aria-selected="false" data-panel="p-tvsearch">Android TV · Search</button>
+  </div>
+</header>
+
+<main class="stage">
+
+  <!-- ============================ PHONE HOME ============================ -->
+  <section class="panel on" id="p-home">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="statusbar"><span>9:41</span><span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 10.5 5.6 8a3.4 3.4 0 0 1 4.8 0L8 10.5Zm-4-4.3L2.6 4.8a7.6 7.6 0 0 1 10.8 0l-1.4 1.4a5.6 5.6 0 0 0-8 0Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="20" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="2.5" y="2.5" width="14" height="7" rx="1.5" fill="currentColor"/><path d="M22.5 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" opacity=".5"/></svg>
+      </span></div>
+
+      <div class="scroll">
+        <div class="hero">
+          <div class="hero-img" style="background-image:url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=900&q=80')"></div>
+          <div class="hero-scrim"></div>
+          <div class="hero-body">
+            <div class="hero-meta"><span class="badge">New Episode</span><span>2024</span><span class="dot"></span><span>16+</span><span class="dot"></span><span>1 Season</span></div>
+            <h2>The Quiet Between Us</h2>
+            <p>A sound engineer who can hear what people never say meets the one person she cannot read.</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>Play
+              </button>
+              <button class="btn btn-ghost">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>My List
+              </button>
+              <button class="btn-icon" aria-label="More">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pad">
+          <div class="reel"><span>Continue Watching</span></div>
+          <div class="cw" id="cw"></div>
+
+          <div class="reel"><span>Trending in Seoul</span></div>
+          <div class="rail" id="r1"></div>
+
+          <div class="reel"><span>Because you watched · Signal</span></div>
+          <div class="rail" id="r2"></div>
+
+          <div class="reel"><span>Films · Late Night</span></div>
+          <div class="rail" id="r3"></div>
+          <div style="height:26px"></div>
+        </div>
+      </div>
+
+      <nav class="tabbar">
+        <button class="tab on"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>Explore</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg>Search</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H9v16H5.5A1.5 1.5 0 0 1 4 18.5zM9 4h9.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H9"/></svg>Library</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4.1a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4z"/></svg>Settings</button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ============================ PHONE DETAIL ============================ -->
+  <section class="panel" id="p-detail">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="statusbar"><span>9:41</span><span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 10.5 5.6 8a3.4 3.4 0 0 1 4.8 0L8 10.5Zm-4-4.3L2.6 4.8a7.6 7.6 0 0 1 10.8 0l-1.4 1.4a5.6 5.6 0 0 0-8 0Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="20" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="2.5" y="2.5" width="14" height="7" rx="1.5" fill="currentColor"/><path d="M22.5 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" opacity=".5"/></svg>
+      </span></div>
+
+      <div class="scroll">
+        <div class="detail-hero">
+          <div class="hero-img" style="background-image:url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=900&q=80')"></div>
+          <div class="hero-scrim"></div>
+          <button class="back"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+        </div>
+
+        <div class="detail-body" style="margin-top:-46px;position:relative;z-index:5">
+          <div class="hero-meta"><span>2024</span><span class="dot"></span><span>16+</span><span class="dot"></span><span>1 Season</span><span class="dot"></span><span>16 Episodes</span></div>
+          <h2 class="detail-title">The Quiet Between Us</h2>
+          <p style="color:var(--muted);font-size:13px;line-height:1.65;margin:0 0 4px">
+            A sound engineer who can hear what people never say meets the one person she cannot read.
+            As the city closes in, listening becomes the most dangerous thing she knows how to do.
+          </p>
+          <div class="chips">
+            <span class="chip">Melodrama</span><span class="chip">Romance</span><span class="chip">Slow Burn</span>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%;margin-bottom:10px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>Resume · S1 E4 · 12:04
+          </button>
+          <div style="display:flex;gap:10px;margin-bottom:6px">
+            <button class="btn btn-ghost" style="flex:1">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>My List
+            </button>
+            <button class="btn btn-ghost" style="flex:1">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 19h14"/></svg>Download
+            </button>
+          </div>
+
+          <div class="reel"><span>Episodes</span></div>
+          <div class="chips" style="margin:0 0 6px">
+            <span class="chip on">Season 1</span>
+          </div>
+
+          <div id="eps"></div>
+          <div style="height:30px"></div>
+        </div>
+      </div>
+
+      <nav class="tabbar">
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>Explore</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg>Search</button>
+        <button class="tab on"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H9v16H5.5A1.5 1.5 0 0 1 4 18.5zM9 4h9.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H9"/></svg>Library</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4.1a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4z"/></svg>Settings</button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ============================ PHONE PLAYER ============================ -->
+  <section class="panel" id="p-player">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="player">
+        <div class="vid" style="background-image:url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1000&q=80')"></div>
+
+        <div class="p-top">
+          <button class="btn-icon" style="width:38px;height:38px;border-radius:50%">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <div style="text-align:right">
+            <div class="p-title">The Quiet Between Us</div>
+            <div class="p-sub">S1 E4 · The Shape of Silence</div>
+          </div>
+        </div>
+
+        <div class="p-center">
+          <div class="p-play">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#150C07"><path d="M8 5.5v13l11-6.5z"/></svg>
+          </div>
+        </div>
+
+        <div class="p-bottom">
+          <div class="p-scrub"><i></i><b></b></div>
+          <div class="p-times"><span>12:04</span><span>−51:18</span></div>
+          <div class="p-controls">
+            <button aria-label="Rewind 10"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5 4 12l7 7"/><path d="M20 5v14"/></svg></button>
+            <button aria-label="Back 10s"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4v4.5h4.5"/></svg></button>
+            <button aria-label="Play"><svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></button>
+            <button aria-label="Forward 10s"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><path d="M21 4v4.5h-4.5"/></svg></button>
+            <button aria-label="Captions"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M9.5 10.5a2 2 0 1 0 0 3M16.5 10.5a2 2 0 1 0 0 3"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ PHONE PAIRING ============================ -->
+  <section class="panel" id="p-pair">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="statusbar"><span>9:41</span><span class="icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 10.5 5.6 8a3.4 3.4 0 0 1 4.8 0L8 10.5Zm-4-4.3L2.6 4.8a7.6 7.6 0 0 1 10.8 0l-1.4 1.4a5.6 5.6 0 0 0-8 0Z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="20" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="2.5" y="2.5" width="14" height="7" rx="1.5" fill="currentColor"/><path d="M22.5 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" opacity=".5"/></svg>
+      </span></div>
+
+      <div class="scroll">
+        <div class="pad" style="padding-top:14px">
+          <div class="reel" style="margin-top:0"><span>Pair a device</span></div>
+          <h2 style="font-family:var(--display);font-size:27px;font-weight:600;letter-spacing:-.02em;margin:2px 0 8px">Approve this TV</h2>
+          <p style="color:var(--muted);font-size:13px;line-height:1.65;margin:0 0 22px">
+            Confirm the code shown on your television. Approving signs that device in once;
+            you can revoke it from Settings at any time.
+          </p>
+
+          <div style="background:var(--surface);border:1px solid var(--hairline);border-radius:var(--r-md);padding:18px;margin-bottom:14px">
+            <div style="font-size:10px;letter-spacing:.20em;text-transform:uppercase;color:var(--faint);margin-bottom:10px">Television</div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:40px;height:40px;border-radius:10px;background:var(--copper-tint);display:grid;place-items:center;color:var(--copper-light)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M8 20.5h8M12 16.5v4"/></svg>
+              </div>
+              <div>
+                <div style="font-size:14px;font-weight:600">Living Room TV</div>
+                <div style="font-size:11px;color:var(--faint);margin-top:2px">Android TV · Chromecast HD</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:center;margin:26px 0 8px">
+            <div class="code" style="margin:0">K7M—4QP</div>
+          </div>
+          <div style="text-align:center" class="code-sub">Code shown on your TV</div>
+
+          <div style="display:flex;gap:10px;margin-top:30px">
+            <button class="btn btn-ghost" style="flex:1">Decline</button>
+            <button class="btn btn-primary" style="flex:1.4">Approve device</button>
+          </div>
+
+          <div style="margin-top:26px;padding:14px;border-radius:var(--r-sm);background:rgba(201,123,74,.07);border:1px solid rgba(201,123,74,.22)">
+            <div style="font-size:11px;line-height:1.6;color:var(--muted)">
+              <b style="color:var(--copper-light)">Only approve a code you can see.</b>
+              The pairing service never handles video — it only carries the approval.
+            </div>
+          </div>
+        </div>
+        <div style="height:30px"></div>
+      </div>
+
+      <nav class="tabbar">
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>Explore</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg>Search</button>
+        <button class="tab"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H9v16H5.5A1.5 1.5 0 0 1 4 18.5zM9 4h9.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H9"/></svg>Library</button>
+        <button class="tab on"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4.1a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4z"/></svg>Settings</button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ============================== TV HOME ============================== -->
+  <section class="panel" id="p-tv">
+    <div class="tvwrap">
+      <div class="tv">
+        <div class="tv-rail">
+          <div class="brand">HALLYU<em>—</em></div>
+          <div class="tvn on"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="lbl">Home</span></div>
+          <div class="tvn"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span><span class="lbl">Explore</span></div>
+          <div class="tvn"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg></span><span class="lbl">Search</span></div>
+          <div class="tvn"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H9v16H5.5A1.5 1.5 0 0 1 4 18.5zM9 4h9.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H9"/></svg></span><span class="lbl">Library</span></div>
+          <div class="tvn"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4.1a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4z"/></svg></span><span class="lbl">Settings</span></div>
+        </div>
+
+        <div class="tv-main">
+          <div class="tv-hero">
+            <div class="img" style="background-image:url('https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?auto=format&fit=crop&w=1600&q=80')"></div>
+            <div class="scrim"></div>
+            <div class="body">
+              <div class="hero-meta"><span class="badge">Featured</span><span>2024</span><span class="dot"></span><span>16+</span><span class="dot"></span><span>1 Season</span></div>
+              <h2>The Quiet<br/>Between Us</h2>
+              <p>A sound engineer who can hear what people never say meets the one person she cannot read.</p>
+              <div style="display:flex;gap:14px">
+                <button class="btn btn-primary">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>Play
+                </button>
+                <button class="btn btn-ghost">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>My List
+                </button>
+              </div>
+            </div>
+
+            <div class="tv-shelf">
+              <div class="reel"><span>Continue Watching</span></div>
+              <div class="tv-row" id="tvrow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== TV ACTIVATION =========================== -->
+  <section class="panel" id="p-tvact">
+    <div class="tvwrap">
+      <div class="tv">
+        <div class="tv-main">
+          <div class="tv-act">
+            <div class="left">
+              <div class="eyebrow" style="margin-bottom:10px">Activation</div>
+              <h2>Sign this TV in<br/>from your phone.</h2>
+              <p>Open HALLYU-STREAM on your phone, choose <b style="color:var(--ivory)">Devices → Pair</b>, then scan the code. This television is signed in once and can be revoked at any time.</p>
+              <div style="display:flex;gap:10px;margin-top:30px;align-items:center;color:var(--faint);font-size:12px;letter-spacing:.06em">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>
+                Expires in <b style="color:var(--copper-light);font-weight:600">09:42</b>
+              </div>
+            </div>
+            <div class="right">
+              <div class="qr">
+                <svg width="166" height="166" viewBox="0 0 33 33" shape-rendering="crispEdges" id="qr"></svg>
+              </div>
+              <div class="code">K7M—4QP</div>
+              <div class="hint">Or enter this code</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= TV SEARCH ============================= -->
+  <section class="panel" id="p-tvsearch">
+    <div class="tvwrap">
+      <div class="tv">
+        <div class="tv-rail">
+          <div class="brand">HALLYU<em>—</em></div>
+          <div class="tvn"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="lbl">Home</span></div>
+          <div class="tvn"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span><span class="lbl">Explore</span></div>
+          <div class="tvn on"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg></span><span class="lbl">Search</span></div>
+          <div class="tvn"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H9v16H5.5A1.5 1.5 0 0 1 4 18.5zM9 4h9.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H9"/></svg></span><span class="lbl">Library</span></div>
+        </div>
+        <div class="tv-main">
+          <div class="searchline">qui<span class="caret"></span></div>
+          <div style="position:absolute;left:56px;top:132px;color:var(--faint);font-size:13px;letter-spacing:.10em;text-transform:uppercase">4 results</div>
+          <div style="position:absolute;left:56px;top:172px;display:flex;gap:16px" id="tvres"></div>
+          <div class="kb" id="kb"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ ANNOTATIONS ============================ -->
+  <aside class="notes">
+    <h4>What you are looking at</h4>
+    <div class="note"><b>S1 · Marquee Hero</b><span>Full-bleed backdrop with a three-stop bottom scrim. The title is Fraunces 600 at −0.02em; the meta row is Inter 500, 11px, letterspaced caps.</span></div>
+    <div class="note"><b>S2 · Smoked-glass chrome</b><span>Glass is rationed to five places only: nav bar, player chrome, sheet grabbers, the TV rail, and pairing panels. Low-tier devices swap it for <code>elevated</code> plus a hairline.</span></div>
+    <div class="note"><b>S3 · The copper thread</b><span>Exactly one copper element per region — the Play button, the progress fill, the active tab, the focus ring. Never two competing accents.</span></div>
+    <div class="note"><b>S4 · Reel labels</b><span>Letterspaced caps above a hairline rule, borrowed from film leader frames. Used for every shelf heading.</span></div>
+    <div class="note"><b>Ten-foot type floor</b><span>On TV nothing renders below 16sp and body text sits at 20sp or above. Focus is a 3dp copper ring with a 1.04 scale, not a colour change.</span></div>
+    <div class="note"><b>Honest states</b><span>Every shelf has skeleton, empty and error variants. The player says “Refreshing the stream…” rather than pretending a dropped URL is still valid.</span></div>
+  </aside>
+</main>
+
+<section class="legend">
+  <div class="sw-card"><div class="dotc" style="background:#0A0B0D;border:1px solid rgba(244,239,231,.12)"></div><div class="nm">Obsidian</div><div class="hx">#0A0B0D</div></div>
+  <div class="sw-card"><div class="dotc" style="background:#111318;border:1px solid rgba(244,239,231,.12)"></div><div class="nm">Surface</div><div class="hx">#111318</div></div>
+  <div class="sw-card"><div class="dotc" style="background:#171A21;border:1px solid rgba(244,239,231,.12)"></div><div class="nm">Elevated</div><div class="hx">#171A21</div></div>
+  <div class="sw-card"><div class="dotc" style="background:#F4EFE7"></div><div class="nm">Ivory</div><div class="hx">#F4EFE7</div></div>
+  <div class="sw-card"><div class="dotc" style="background:#A8A199"></div><div class="nm">Muted</div><div class="hx">#A8A199</div></div>
+  <div class="sw-card"><div class="dotc" style="background:#C97B4A"></div><div class="nm">Copper</div><div class="hx">#C97B4A</div></div>
+  <div class="sw-card"><div class="dotc" style="background:#E0A277"></div><div class="nm">Copper Light</div><div class="hx">#E0A277</div></div>
+  <div class="sw-card"><div class="dotc" style="background:rgba(201,123,74,.14);border:1px solid rgba(201,123,74,.4)"></div><div class="nm">Copper Tint</div><div class="hx">rgba(201,123,74,.14)</div></div>
+</section>
+
+<footer class="foot">
+  Preview only — this page re-creates the React Native layouts in HTML/CSS so the interface can be
+  inspected in a browser. The shipping app is <code style="color:var(--copper-light)">mobile/</code> (React Native 0.76.5, TypeScript),
+  with the pairing service in <code style="color:var(--copper-light)">backend/</code>.
+  Titles and artwork shown here are placeholders; the real catalogue is resolved on device from the provider.
+</footer>
+
+<script>
+/* ------------------------------ data ------------------------------ */
+const IMG = [
+  'photo-1536440136628-849c177e76a1','photo-1517604931442-7e0c8ed2963c',
+  'photo-1489599849927-2ee91cede3ba','photo-1478720568477-152d9b164e26',
+  'photo-1512070679279-8988d32161be','photo-1542204165-65bf26472b9b',
+  'photo-1509347528160-9a9e33742cdb','photo-1518676590629-3dcbd9c5a5c9',
+  'photo-1594909122845-11baa439b7bf','photo-1574267432553-4b4628081c31',
+  'photo-1490750967868-88aa4486c946','photo-1440404653325-ab127d49abc1',
+  'photo-1516450360452-9312f5e86fc7','photo-1524985069026-dd778a71c7b4',
+  'photo-1485846234645-a62644f84728','photo-1502134249126-9f3755a50d78'
+];
+const u = (i,w=400)=>`https://images.unsplash.com/${IMG[i%IMG.length]}?auto=format&fit=crop&w=${w}&q=80`;
+
+const TITLES = [
+  ['The Quiet Between Us','S1 · E4','2024'],['Signal, Again','S1 · E9','2023'],
+  ['Han River Lights','Film','2024'],['Paper Moon Motel','S2 · E2','2022'],
+  ['Winter, Slowly','Film','2021'],['The Understudy','S1 · E11','2024'],
+  ['Nine Summers','Film','2023'],['Blue Hour Diner','S1 · E6','2022'],
+  ['A Room of Rain','Film','2020'],['Last Train North','S1 · E1','2024'],
+  ['Small Hours','Film','2023'],['The Cartographer','S1 · E7','2021'],
+  ['Glasshouse','Film','2022'],['Everything, Later','S1 · E3','2024'],
+  ['Salt & Static','Film','2021'],['The Long Way Home','S1 · E15','2023']
+];
+
+/* --------------------------- phone rails --------------------------- */
+function posterHTML(t,i,progress){
+  const [name,sub,year]=t;
+  return `<div class="poster">
+    <div class="art" style="background-image:url('${u(i)}')">
+      ${progress?`<div class="progress"><i style="width:${progress}%"></i></div>`:''}
+    </div>
+    <div class="name">${name}</div>
+    <div class="sub">${sub} · ${year}</div>
+  </div>`;
+}
+function cwHTML(t,i,progress){
+  const [name,sub]=t;
+  return `<div class="cwcard">
+    <div class="art" style="background-image:url('${u(i,600)}')">
+      <div class="play"><svg width="15" height="15" viewBox="0 0 24 24" fill="#F4EFE7"><path d="M8 5.5v13l11-6.5z"/></svg></div>
+      <div class="progress"><i style="width:${progress}%"></i></div>
+    </div>
+    <div class="name">${name}</div>
+    <div class="sub">${sub} · ${Math.round(progress*0.9)} min left</div>
+  </div>`;
+}
+
+document.getElementById('cw').innerHTML = [0,3,7,10].map((i,k)=>cwHTML(TITLES[i],i,[38,72,15,54][k])).join('');
+document.getElementById('r1').innerHTML = [1,4,6,9,12,14].map(i=>posterHTML(TITLES[i],i)).join('');
+document.getElementById('r2').innerHTML = [2,5,8,11,13].map(i=>posterHTML(TITLES[i],i)).join('');
+document.getElementById('r3').innerHTML = [15,10,7,3,0].map(i=>posterHTML(TITLES[i],i)).join('');
+
+/* ----------------------------- episodes ---------------------------- */
+document.getElementById('eps').innerHTML = [
+  ['E1','The Shape of Silence','1:04:12',0],
+  ['E2','A Room With No Echo','58:40',0],
+  ['E3','Everything We Did Not Say','1:01:05',0],
+  ['E4','The Shape of Silence, Again','1:03:22',38],
+  ['E5','Low Frequency','59:18',0],
+  ['E6','What the Walls Keep','1:02:44',0]
+].map(([n,t,d,p])=>`
+  <div class="ep">
+    <div class="thumb" style="background-image:url('${u(parseInt(n.slice(1))+2,300)}')">
+      ${p?`<div class="progress"><i style="width:${p}%"></i></div>`:''}
+    </div>
+    <div style="flex:1;min-width:0">
+      <div class="n">Episode ${n.slice(1)}</div>
+      <div class="t">${t}</div>
+      <div class="d">${d}${p?' · 38% watched':''}</div>
+    </div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E6862" stroke-width="1.7"><path d="M9 5l7 7-7 7"/></svg>
+  </div>`).join('');
+
+/* ------------------------------ TV row ----------------------------- */
+document.getElementById('tvrow').innerHTML = [0,1,2,5,8].map(i=>`
+  <div class="tvcard">
+    <div class="art" style="background-image:url('${u(i,400)}')"></div>
+    <div class="nm">${TITLES[i][0]}</div>
+  </div>`).join('');
+
+/* --------------------------- TV results ---------------------------- */
+document.getElementById('tvres').innerHTML = [0,3,7,12].map(i=>`
+  <div class="tvcard" style="flex:0 0 132px">
+    <div class="art" style="height:186px;background-image:url('${u(i,300)}')"></div>
+    <div class="nm">${TITLES[i][0]}</div>
+  </div>`).join('');
+
+/* --------------------------- A–Z keyboard -------------------------- */
+const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+document.getElementById('kb').innerHTML =
+  letters.map(l=>`<div class="key">${l}</div>`).join('') +
+  `<div class="key wide">Space</div><div class="key wide">Delete</div>` +
+  `<div class="key wide" style="background:var(--copper-tint);border-color:rgba(201,123,74,.6);color:var(--copper-light)">Search</div>`;
+
+/* ------------------------------- QR -------------------------------- */
+(function drawQR(){
+  const N=33, svg=document.getElementById('qr');
+  const NS='http://www.w3.org/2000/svg';
+  let seed=20240917;
+  const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;};
+  const rect=(x,y,w,h,fill)=>{
+    const r=document.createElementNS(NS,'rect');
+    r.setAttribute('x',x);r.setAttribute('y',y);
+    r.setAttribute('width',w);r.setAttribute('height',h);
+    r.setAttribute('fill',fill);
+    svg.appendChild(r);
+  };
+  const finder=(x,y)=>{
+    rect(x,y,7,7,'#0A0B0D');
+    rect(x+1,y+1,5,5,'#F4EFE7');
+    rect(x+2,y+2,3,3,'#0A0B0D');
+  };
+  const inFinder=(x,y)=>(x<8&&y<8)||(x>N-9&&y<8)||(x<8&&y>N-9);
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    if(inFinder(x,y))continue;
+    if(rnd()>0.50) rect(x,y,1,1,'#0A0B0D');
+  }
+  finder(0,0);finder(N-7,0);finder(0,N-7);
+})();
+
+/* ----------------------------- switcher ---------------------------- */
+document.querySelectorAll('.sw').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.sw').forEach(b=>b.setAttribute('aria-selected','false'));
+    btn.setAttribute('aria-selected','true');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+    document.getElementById(btn.dataset.panel).classList.add('on');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
