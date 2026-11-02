@@ -83,9 +83,9 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // CI overrides these: -PversionCode=… -PversionName=…
-        versionCode (project.findProperty("versionCode") ?: 1).toInteger()
-        versionName (project.findProperty("versionName") ?: "1.0.0")
-        buildConfigField "String", "PAIRING_BASE_URL", "\"${project.findProperty("pairingBaseUrl") ?: "http://10.0.2.2:8787"}\""
+        versionCode project.hasProperty("versionCode") ? project.property("versionCode").toInteger() : 1
+        versionName project.hasProperty("versionName") ? project.property("versionName") : "1.0.0"
+        buildConfigField "String", "PAIRING_BASE_URL", "\"${project.hasProperty("pairingBaseUrl") ? project.property("pairingBaseUrl") : "http://10.0.2.2:8787"}\""
     }
     buildFeatures {
         buildConfig true
