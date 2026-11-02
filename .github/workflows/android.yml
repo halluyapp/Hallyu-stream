@@ -60,14 +60,27 @@ jobs:
             --bundle-output /tmp/bundle/index.android.bundle \
             --assets-dest /tmp/bundle/res
 
+      # NOTE: secrets cannot be used in `if:` expressions (GitHub rejects the
+      # whole workflow at parse time), so the presence check happens in shell.
       - name: Decode release keystore
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KS_KEYPASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/hallyu-release.keystore"
-          echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/hallyu-release.keystore" >> "$GITHUB_ENV"
-          echo "ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
-          echo "ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> "$GITHUB_ENV"
-          echo "ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+          if [ -z "$KS_B64" ]; then
+            echo "No ANDROID_KEYSTORE_BASE64 secret — release build will fall back to the debug key."
+            exit 0
+          fi
+          printf '%s' "$KS_B64" | base64 -d > "$RUNNER_TEMP/hallyu-release.keystore"
+          {
+            echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/hallyu-release.keystore"
+            echo "ANDROID_KEYSTORE_PASSWORD=$KS_PASS"
+            echo "ANDROID_KEY_ALIAS=$KS_ALIAS"
+            echo "ANDROID_KEY_PASSWORD=$KS_KEYPASS"
+          } >> "$GITHUB_ENV"
+          echo "Release keystore decoded."
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
