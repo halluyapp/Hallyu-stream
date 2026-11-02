@@ -48,7 +48,7 @@ cd android && ./gradlew assembleDebug
 cd android && ./gradlew assembleRelease -Pandroid.injected.signing.store.file=... # CI supplies these
 ```
 
-Debug and release APKs are uploaded as workflow artifacts. Release signing uses an ephemeral runner key; use a real production keystore for distribution.
+Debug and release APKs are uploaded as workflow artifacts. Release signing uses an ephemeral runner key; use a real production keystore for distribution. The workflow patches the generated Android project to Kotlin `1.9.25` and a 4 GB Gradle heap, because Expo SDK 52's Compose compiler rejects the RN version catalog's default Kotlin `1.9.24`.
 
 ## Not verified here
 

@@ -42,7 +42,7 @@ npm ci --prefix apps/tv
 gradle --project-dir apps/tv/android assembleDebug assembleRelease
 ```
 
-Debug and release APKs are uploaded as workflow artifacts. Release signing is optional and driven by `HALLYU_SIGNING_*` environment variables; CI generates an ephemeral keystore, and production should use a real keystore.
+Debug and release APKs are uploaded as workflow artifacts. Release signing is optional and driven by `HALLYU_SIGNING_*` environment variables; CI generates an ephemeral keystore, and production should use a real keystore. The checked-in `gradle.properties` disables Jetifier and allocates a 4 GB Gradle heap; Jetifier otherwise exhausts memory transforming the large `react-native-tvos` AAR.
 
 ## Honesty
 

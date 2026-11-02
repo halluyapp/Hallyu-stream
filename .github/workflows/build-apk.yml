@@ -23,7 +23,7 @@ env:
   EXPO_NO_TELEMETRY: '1'
   NODE_OPTIONS: '--max-old-space-size=4096'
   NPM_CONFIG_LEGACY_PEER_DEPS: 'true'
-  GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Xmx4g -XX:MaxMetaspaceSize=1g'
+  GRADLE_OPTS: '-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.workers.max=2'
 
 jobs:
   verify:
@@ -125,6 +125,31 @@ jobs:
         working-directory: apps/mobile
         run: npx expo prebuild --platform android --clean
         # CI=1 in the workflow env keeps prebuild non-interactive.
+
+      - name: Align generated Gradle config with Expo SDK 52
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path('apps/mobile/android')
+          build = root / 'build.gradle'
+          text = build.read_text()
+          old = "classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')"
+          new = "classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25')"
+          assert old in text, 'Unexpected Expo template: Kotlin classpath line not found'
+          build.write_text(text.replace(old, new))
+
+          props = root / 'gradle.properties'
+          gradle_props = props.read_text()
+          gradle_props = gradle_props.replace(
+              'org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m',
+              'org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m',
+          )
+          for line in ('org.gradle.parallel=false', 'android.kotlinVersion=1.9.25'):
+              if line not in gradle_props:
+                  gradle_props += f'\n{line}\n'
+          props.write_text(gradle_props)
+          print('Patched Kotlin plugin to 1.9.25 and Gradle heap to 4g')
+          PY
 
       - name: Build debug + release APKs
         working-directory: apps/mobile/android
