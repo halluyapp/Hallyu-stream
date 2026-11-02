@@ -27,11 +27,47 @@ function list(value: unknown): Any[] {
 }
 
 /** Map any plausible content-type marker to our union. */
-function contentType(value: unknown): 'movie' | 'series' | null {
-  const raw = str(value)?.toLowerCase() ?? '';
-  if (raw.includes('serie') || raw === 'tv' || raw === 'show') return 'series';
-  if (raw.includes('movie') || raw === 'film') return 'movie';
+function contentType(...values: unknown[]): 'movie' | 'series' | null {
+  for (const value of values) {
+    const raw = str(value)?.toLowerCase() ?? '';
+    if (!raw) continue;
+    if (raw === '2' || raw.includes('serie') || raw === 'tv' || raw === 'show') return 'series';
+    if (raw === '1' || raw.includes('movie') || raw === 'film') return 'movie';
+  }
   return null;
+}
+
+/** Extract a year from '2008-01-20', '2008', 2008, etc. */
+function yearOf(value: unknown): number | null {
+  const raw = str(value);
+  if (!raw) return null;
+  const match = raw.match(/\d{4}/);
+  if (!match) return null;
+  const year = Number(match[0]);
+  return year > 1900 && year < 2100 ? year : null;
+}
+
+/** Cover may be a URL string or an object like { url, width, ... }. */
+function coverUrl(value: unknown): string | null {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return str((value as Any).url);
+  }
+  return str(value);
+}
+
+/** 'Crime,Drama,Thriller' | ['Crime','Drama'] | [{name}] -> string[] */
+function listOfNames(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((v) => str(typeof v === 'object' && v !== null ? (v as Any).name : v))
+      .filter((v): v is string => !!v);
+  }
+  const raw = str(value);
+  if (!raw) return [];
+  return raw
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
 }
 
 export function normalizeTitle(raw: Any, categories: string[] = []): Title | null {
@@ -42,6 +78,7 @@ export function normalizeTitle(raw: Any, categories: string[] = []): Title | nul
   const detailPath = str(
     raw.detailPath ??
       raw.detail_path ??
+      raw.slug ??
       raw.path ??
       raw.detail ??
       (typeof raw.detailUrl === 'string' ? raw.detailUrl.split('/').pop() : null),
@@ -55,25 +92,23 @@ export function normalizeTitle(raw: Any, categories: string[] = []): Title | nul
     }))
     .filter((s) => s.seasonNumber > 0);
 
-  const genres = Array.isArray(raw.genres)
-    ? raw.genres.map((g: unknown) => str(typeof g === 'object' ? (g as Any)?.name : g)).filter((g): g is string => !!g)
-    : [];
+  const genres = listOfNames(raw.genres ?? raw.genre);
 
-  const year = num(raw.releaseYear ?? raw.year ?? raw.release_year);
-  const rating = str(raw.rating ?? raw.score);
+  const rating = str(raw.rating ?? raw.score ?? raw.imdbRatingValue ?? raw.imdb_rating);
 
   return {
     subjectId,
     detailPath,
     title,
-    cover: str(raw.cover ?? raw.poster ?? raw.image ?? raw.thumb),
-    backdrop: str(raw.backdrop ?? raw.background ?? raw.fanart),
+    cover: coverUrl(raw.cover ?? raw.poster_url ?? raw.poster ?? raw.image ?? raw.thumb),
+    backdrop: coverUrl(raw.backdrop ?? raw.background ?? raw.fanart),
     description: str(raw.description ?? raw.overview ?? raw.synopsis ?? raw.plot),
     genres,
-    releaseYear: year && year > 1900 && year < 2100 ? year : null,
+    releaseYear: yearOf(raw.releaseYear ?? raw.year ?? raw.release_year ?? raw.releaseDate ?? raw.release_date),
     rating: rating ? (num(rating) !== null ? String(num(rating)) : rating) : null,
-    contentType: contentType(raw.contentType ?? raw.type ?? raw.mediaType),
+    contentType: contentType(raw.type, raw.contentType, raw.subjectType, raw.mediaType),
     seasons,
+    subtitleLanguages: listOfNames(raw.subtitles),
     categories,
   };
 }
@@ -108,10 +143,12 @@ export function normalizeHome(raw: unknown): HomeRow[] {
     if (titles.length) out.push({ key, label, titles });
   };
 
-  if (Array.isArray(raw)) {
-    for (let i = 0; i < raw.length; i++) {
-      const row = raw[i] as Any;
-      const label = str(row.title ?? row.name ?? row.category) ?? `Section ${i + 1}`;
+  const root = ((raw as Any)?.sections ? (raw as Any).sections : (raw as Any)?.data?.sections ?? raw) as unknown;
+
+  if (Array.isArray(root)) {
+    for (let i = 0; i < root.length; i++) {
+      const row = root[i] as Any;
+      const label = str(row.section ?? row.title ?? row.name ?? row.category) ?? `Section ${i + 1}`;
       const cats = [label];
       push(String(row.id ?? row.key ?? label), label, normalizeTitleList(row.items ?? row.list ?? row.data ?? row, cats));
     }
@@ -135,16 +172,19 @@ export function normalizeSearch(raw: unknown): { titles: Title[]; hasMore: boole
   const titles = normalizeTitleList(rows);
   const page = num((data as Any)?.page) ?? 1;
   const totalPages = num((data as Any)?.totalPages ?? (data as Any)?.total_pages) ?? num((data as Any)?.pages);
-  const hasMore = totalPages !== null ? page < totalPages : titles.length > 0;
+  const hasMoreFlag = (data as Any)?.has_more;
+  const hasMore =
+    hasMoreFlag !== undefined ? Boolean(hasMoreFlag) : totalPages !== null ? page < totalPages : titles.length > 0;
   return { titles, hasMore };
 }
 
 export function normalizeDetail(raw: unknown): { title: Title; seasons: Season[] } | null {
   const data = ((raw as Any)?.data ?? raw) as Any;
-  const inner = data?.resource ?? data?.detail ?? data;
-  const normalized = normalizeTitle({ ...inner, ...data });
+  const subject = (data?.subject ?? data?.detail ?? data) as Any;
+  const resource = (data?.resource ?? {}) as Any;
+  const normalized = normalizeTitle({ ...subject, seasons: subject.seasons ?? resource.seasons });
   if (!normalized) return null;
-  const seasons: Season[] = list(inner?.seasons ?? data?.seasons)
+  const seasons: Season[] = list(resource.seasons ?? subject.seasons ?? data?.seasons)
     .map((s) => ({
       seasonNumber: num(s.se ?? s.season ?? s.seasonNumber ?? s.number) ?? 1,
       maxEpisodes: num(s.maxEp ?? s.max_ep ?? s.maxEpisodes ?? s.episodes) ?? 0,
@@ -169,7 +209,7 @@ export function normalizeSources(raw: unknown): StreamSource[] {
       resolution,
       format: format ? format.toUpperCase() : null,
       url,
-      sizeBytes: sizeBytes !== null ? (sizeBytes < 1e7 ? sizeBytes : sizeBytes) : null,
+      sizeBytes,
       durationSec,
       codec: str(row.codec),
     });

@@ -42,6 +42,7 @@ export default function PlayerScreen() {
     episode: string;
     positionMs: string;
     contentType: string;
+    subtitleLangs: string;
   }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -59,6 +60,11 @@ export default function PlayerScreen() {
   const [sources, setSources] = useState<{ resolution: string | null; url: string }[]>([]);
   const [lockedQuality, setLockedQuality] = useState<string | null>(null); // null = Auto
   const [captions, setCaptions] = useState<{ language: string; url: string }[]>([]);
+  // Languages the provider advertises for this title (no track URLs in this build).
+  // Languages the provider advertises for this title (no track URLs in this build).
+  const [subLangs] = useState<string[]>(() =>
+    (params.subtitleLangs ?? '').split('|').map((s) => s.trim()).filter(Boolean),
+  );
   const [sheet, setSheet] = useState<'quality' | 'subtitles' | null>(null);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [currentTime, setCurrentTime] = useState(startPosition);
@@ -379,9 +385,12 @@ export default function PlayerScreen() {
       {/* Subtitles sheet — honesty: only real caption tracks (§13.8). */}
       <BottomSheet visible={sheet === 'subtitles'} onClose={() => setSheet(null)} title="Subtitles">
         <View style={{ paddingHorizontal: layout.marginMobile, paddingBottom: 40, paddingTop: 8 }}>
-          {captions.length ? (
-            captions.map((c) => (
-              <View key={c.url} style={styles.sheetRow}>
+          {captions.length || subLangs.length ? (
+            (captions.length
+              ? captions.map((c) => ({ key: c.url, language: c.language }))
+              : subLangs.map((l) => ({ key: `lang-${l}`, language: l }))
+            ).map((c) => (
+              <View key={c.key} style={styles.sheetRow}>
                 <Text style={styles.sheetRowLabel}>{c.language}</Text>
                 <Text style={styles.sheetEmpty}>Not rendered in this build</Text>
               </View>

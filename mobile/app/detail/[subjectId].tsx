@@ -122,6 +122,7 @@ export default function DetailScreen() {
                 episode: ep,
                 positionMs,
                 contentType: state.title.contentType ?? 'movie',
+                subtitleLangs: state.title.subtitleLanguages,
               })
             }
             onMyList={() => {
@@ -156,6 +157,7 @@ export default function DetailScreen() {
               episode: ep,
               positionMs: 0,
               contentType: state.title.contentType ?? 'series',
+              subtitleLangs: state.title.subtitleLanguages,
             });
           }
         }}

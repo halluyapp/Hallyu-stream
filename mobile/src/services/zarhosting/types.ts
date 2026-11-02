@@ -17,6 +17,8 @@ export interface Title {
   rating: string | null;
   contentType: 'movie' | 'series' | null;
   seasons: Season[];
+  /** Subtitle language names advertised by the provider (no track URLs in v1). */
+  subtitleLanguages: string[];
   /** Loose category/collection hints carried by home rows (for Explore). */
   categories: string[];
 }

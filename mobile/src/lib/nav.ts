@@ -30,6 +30,8 @@ export function openPlayer(params: {
   episode: number;
   positionMs?: number;
   contentType?: string;
+  /** Comma-separated subtitle language names, passed through to the player sheet. */
+  subtitleLangs?: string[];
 }) {
   router.push({
     pathname: '/player',
@@ -41,6 +43,7 @@ export function openPlayer(params: {
       episode: String(params.episode),
       positionMs: params.positionMs ? String(Math.round(params.positionMs)) : '0',
       contentType: params.contentType ?? 'movie',
+      subtitleLangs: (params.subtitleLangs ?? []).join('|'),
     },
   });
 }
