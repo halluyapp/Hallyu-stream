@@ -54,10 +54,11 @@ All are optional GitHub Actions repository variables, not secrets. Absent values
 
 Phone reads `EXPO_PUBLIC_*` at Expo prebuild/bundle time. TV reads `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `PAIRING_CLIENT_KEY`, `ZAR_BASE_URL`, `MOVIE_SEASON`, `MOVIE_EPISODE` from `apps/tv/.env`; each falls back to the matching `EXPO_PUBLIC_*` variable.
 
-## Local validation performed
+## Validation performed
 
 - Workflow YAML parsed with PyYAML.
 - Workflow validated with `@action-validator/cli`.
 - Root strict typecheck, smoke test, and preview production build pass locally.
+- GitHub Actions [run 41509904497](https://github.com/halluyapp/hallyu-stream/actions/runs/41509904497) completed successfully on `68f2f75`, uploading debug + release APK artifacts for both phone and TV clients.
 
-No Android build has run in this sandbox (no Java / Android SDK). The first real APK result will appear in the GitHub Actions run after this workflow is pushed.
+No Android build has run in this sandbox (no Java / Android SDK); APKs are produced exclusively by the GitHub Actions runner. The artifacts are CI builds, not store-ready signed releases.

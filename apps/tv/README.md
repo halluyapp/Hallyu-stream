@@ -48,5 +48,5 @@ Debug and release APKs are uploaded as workflow artifacts. Release signing is op
 
 - No fake pairing: Activation only succeeds after the Supabase Edge Function returns `approved` with a one-time device token.
 - No media proxy: the TV resolves stream JSON and plays CDN bytes directly.
-- This sandbox has no Java/Android SDK, so no APK was built locally and no CI artifact is claimed yet. TV focus visibility at 3 metres and physical playback remain hardware QA items (`10-NFR_AND_TESTING.md`).
+- This sandbox has no Java/Android SDK, so no APK was built locally. The GitHub Actions workflow produced CI debug/release APK artifacts on run `41509904497`; TV focus visibility at 3 metres and physical playback remain hardware QA items (`10-NFR_AND_TESTING.md`).
 - Fonts: copy Fraunces/Inter TTFs into `android/app/src/main/assets/fonts/` and link with `react-native-asset` before a release build; the shared token layer already names them.

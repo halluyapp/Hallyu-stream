@@ -52,4 +52,4 @@ Debug and release APKs are uploaded as workflow artifacts. Release signing uses 
 
 ## Not verified here
 
-This sandbox has no Java/Android SDK, so no APK was built locally and no CI artifact is claimed yet. Physical-device checks (camera permission, low-RAM performance, CDN playback with custom headers) remain on the QA matrix in `10-NFR_AND_TESTING.md`.
+This sandbox has no Java/Android SDK, so no APK was built locally. The GitHub Actions workflow produced CI debug/release APK artifacts on run `41509904497`; physical-device checks (camera permission, low-RAM performance, CDN playback with custom headers) remain on the QA matrix in `10-NFR_AND_TESTING.md`.

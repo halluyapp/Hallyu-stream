@@ -60,7 +60,7 @@ cd apps/mobile && npm ci && npm run android
 cd apps/tv     && npm ci && npm run android
 ```
 
-Native builds require a local Android SDK/NDK and Java. The TV app aliases `react-native` to `react-native-tvos`, so install it with `NPM_CONFIG_LEGACY_PEER_DEPS=true` (the CI workflow already sets this). This sandbox has **no Java/Android SDK**, so APKs are not built or claimed here; the source, manifests, and build configs are provided.
+Native builds require a local Android SDK/NDK and Java. The TV app aliases `react-native` to `react-native-tvos`, so install it with `NPM_CONFIG_LEGACY_PEER_DEPS=true` (the CI workflow already sets this). This sandbox has **no Java/Android SDK**, so APKs are built by the GitHub Actions workflow, not locally; the source, manifests, and build configs are provided here.
 
 ---
 
@@ -91,7 +91,7 @@ Optional GitHub Actions repository variables (not secrets) supply build-time con
 
 Missing variables fall back to empty strings / `0`, so the APK still builds while pairing correctly reports an unconfigured backend. See `.github/workflows/README.md` for the exact CI commands and notes.
 
-**Status:** the workflow YAML is validated locally. No GitHub Actions run has completed yet, so no APK artifact is claimed. Check the repository’s Actions tab after the first push.
+**Status:** the workflow ran successfully on `68f2f75` — [run 41509904497](https://github.com/halluyapp/hallyu-stream/actions/runs/41509904497). Debug and release APK artifacts were uploaded for both clients: `hallyu-stream-mobile-apk-68f2f75…` and `hallyu-stream-tv-apk-68f2f75…` (14-day retention). Download them from the run’s Artifacts section. This is a CI build, not a store-ready signed release: production distribution still needs a persistent keystore and hardware QA.
 
 ---
 
@@ -121,7 +121,7 @@ No service-role key, DB password, or signed media URL is ever placed in client c
 | 6 Library + downloads + offline | Local store done; device download manager planned |
 | 7 Pairing backend + QR + revoke | **Backend source written; deployment blocked — see below** |
 | 8 Motion polish + performance pass | Planned |
-| 9 QA matrix + release builds | **CI workflow added; APK artifacts pending first successful GitHub Actions run** |
+| 9 QA matrix + release builds | **GitHub Actions APK build succeeded; debug + release artifacts uploaded. Hardware QA and production signing still pending** |
 
 ### Blocker: Supabase project creation
 
@@ -131,9 +131,9 @@ No service-role key, DB password, or signed media URL is ever placed in client c
 
 ### Verified vs assumed
 
-- **Verified:** repository contents, tooling availability, Supabase org/project list, free-limit refusal, TypeScript strictness of the shared layer, preview production build, offline smoke test, and local validation of the GitHub Actions workflow YAML.
-- **Assumed / unverified:** live `zarhosting` response shapes (normalisers are defensive), live CDN playback, physical low-RAM phone behaviour, Android TV focus on hardware, QR camera permission flow on device, and a successful first GitHub Actions APK build. The spec’s own Appendix D lists hardware items as open.
-- **Not claimed:** any APK artifact yet, any real playback, any successful pairing, any provider smoke test from this sandbox (outbound network here is restricted to package registries/GitHub).
+- **Verified:** repository contents, tooling availability, Supabase org/project list, free-limit refusal, TypeScript strictness of the shared layer, preview production build, offline smoke test, local validation of the GitHub Actions workflow YAML, and a successful GitHub Actions run that built and uploaded phone + TV debug/release APK artifacts ([run 41509904497](https://github.com/halluyapp/hallyu-stream/actions/runs/41509904497)).
+- **Assumed / unverified:** live `zarhosting` response shapes (normalisers are defensive), live CDN playback, physical low-RAM phone behaviour, Android TV focus on hardware, QR camera permission flow on device, and installation/playback of the CI APKs on real hardware. The spec’s own Appendix D lists hardware items as open.
+- **Not claimed:** real playback, successful pairing, provider smoke test from this sandbox (outbound network here is restricted to package registries/GitHub), or store-ready production signing. APK artifacts exist but have not been exercised on a physical device.
 
 ---
 
