@@ -21,6 +21,23 @@
 
 Artifacts are retained for 14 days and are downloadable from the run’s Artifacts section in the GitHub Actions UI.
 
+## Fresh clean re-run (after the user-reported failure)
+
+| Field | Value |
+|---|---|
+| Run | [41514853664](https://github.com/halluyapp/hallyu-stream/actions/runs/41514853664) |
+| Commit | `ca03757a89db4ac8ea77ea8f21f3380f1e15a98c` |
+| Trigger | `push` to `arena/69ba68a7-hallyu-stream` |
+| Conclusion | `success` |
+| Jobs | `verify` ✅ · `build-mobile-apk` ✅ · `build-tv-apk` ✅ · `release` skipped (not a tag) |
+| Artifacts | phone `101,044,592` bytes · TV `62,082,867` bytes · preview `299,950` bytes |
+
+The three red runs earlier in this workflow’s history (`41505221946`, `41506666652`, `41508210622`) are superseded iterations. Their causes — Kotlin 1.9.25 alignment, TV Jetifier OOM, RN 0.76 native-module pins, and the missing `expo-asset` release dependency — were fixed in the following commits. They are not the current build.
+
+## Direct APK downloads
+
+GitHub Actions artifacts are zipped and served from Azure blob storage; that download is blocked from some networks and can present as a failed download even when the run is green. To remove that failure mode, a `v*` tag run attaches the phone and TV `.apk` files to a **GitHub Release** as direct assets. See the repository’s Releases page for `v0.1.0`.
+
 ## Jobs
 
 - `verify` — strict TypeScript check, shared-layer smoke test, preview production build: **passed**

@@ -1,15 +1,16 @@
 # GitHub Actions — Android APK builds
 
-`build-apk.yml` is the only workflow in this directory. It produces installable debug and release APKs for both native clients without requiring a local Android SDK.
+`build-apk.yml` is the only Android workflow in this repository. It produces installable debug and release APKs for both native clients without requiring a local Android SDK. The earlier `main` workflow `android.yml` and its `mobile/` app were removed during consolidation; there is no longer a second, conflicting "Build Android APK" job.
 
 ## Triggers
 
+- `push` to `main`
 - `push` to `arena/69ba68a7-hallyu-stream`
 - `push` of a `v*` tag
 - `pull_request` targeting `main`
 - manual `workflow_dispatch`
 
-Tag pushes matching `v*` additionally attach the built APKs to a GitHub Release.
+Tag pushes matching `v*` additionally attach the built APKs to a GitHub Release as direct `.apk` assets. Prefer those Release assets over the zipped Actions artifacts: artifact blob downloads can be blocked by network egress rules even when the run is green.
 
 ## What each job does
 
@@ -60,5 +61,6 @@ Phone reads `EXPO_PUBLIC_*` at Expo prebuild/bundle time. TV reads `SUPABASE_URL
 - Workflow validated with `@action-validator/cli`.
 - Root strict typecheck, smoke test, and preview production build pass locally.
 - GitHub Actions [run 41509904497](https://github.com/halluyapp/hallyu-stream/actions/runs/41509904497) completed successfully on `68f2f75`, uploading debug + release APK artifacts for both phone and TV clients.
+- GitHub Actions [run 41514853664](https://github.com/halluyapp/hallyu-stream/actions/runs/41514853664) completed successfully on `ca03757` after a clean push-triggered re-run: `verify`, `build-mobile-apk` and `build-tv-apk` all passed.
 
 No Android build has run in this sandbox (no Java / Android SDK); APKs are produced exclusively by the GitHub Actions runner. The artifacts are CI builds, not store-ready signed releases.
