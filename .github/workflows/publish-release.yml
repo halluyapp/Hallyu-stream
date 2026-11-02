@@ -1,0 +1,71 @@
+name: Publish APK Release
+
+'on':
+  repository_dispatch:
+    types: [publish-apks]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'GitHub Actions run ID whose phone/TV APK artifacts should be published'
+        required: true
+        type: string
+      tag:
+        description: 'Existing release tag to publish to'
+        required: true
+        default: 'v0.1.1'
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    name: Attach existing CI APKs to a release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Resolve dispatch inputs
+        id: cfg
+        env:
+          EVENT_RUN_ID: ${{ github.event.client_payload.run_id }}
+          EVENT_TAG: ${{ github.event.client_payload.tag }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          RUN_ID="${EVENT_RUN_ID:-$INPUT_RUN_ID}"
+          TAG="${EVENT_TAG:-${INPUT_TAG:-v0.1.1}}"
+          if [ -z "$RUN_ID" ]; then
+            echo 'No source run_id supplied' >&2
+            exit 1
+          fi
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Publishing artifacts from run $RUN_ID to $TAG"
+
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ steps.cfg.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: hallyu-stream-*-apk-*
+          merge-multiple: true
+          path: artifacts
+
+      - name: List APK assets
+        run: |
+          shopt -s nullglob
+          files=(artifacts/*.apk)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo 'No APK assets found' >&2
+            exit 1
+          fi
+          ls -lh "${files[@]}"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.cfg.outputs.tag }}
+          name: HALLYU-STREAM ${{ steps.cfg.outputs.tag }}
+          files: artifacts/*.apk
+          generate_release_notes: true
+          draft: false
+          prerelease: false
