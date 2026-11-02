@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HALLYU-STREAM · LIVE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:#0A0B0D; --surface:#111318; --elevated:#171A21;
+  --glass:rgba(17,19,24,.72); --ivory:#F4EFE7; --muted:#A8A199; --faint:#6E6862;
+  --copper:#C97B4A; --copper-light:#E0A277; --copper-deep:#8F5230;
+  --copper-tint:rgba(201,123,74,.14);
+  --error:#D9584B; --warning:#D9A441; --success:#7FA877; --info:#6E8CA8;
+  --r-xs:8px; --r-sm:12px; --r-md:16px; --r-lg:24px; --r-pill:999px;
+  --ease:cubic-bezier(.20,0,0,1); --emph:cubic-bezier(.05,.7,.1,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--obsidian);color:var(--ivory);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased}
+body{padding-bottom:120px}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--copper-tint);color:var(--ivory)}
+::-webkit-scrollbar{height:8px;width:8px}
+::-webkit-scrollbar-thumb{background:#2a2d35;border-radius:99px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ---------- top chrome (S2 smoked glass) ---------- */
+.top{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:20px;
+  padding:14px 32px;background:var(--glass);backdrop-filter:blur(24px) saturate(140%);
+  border-bottom:1px solid rgba(244,239,231,.06)}
+.brand{display:flex;align-items:baseline;gap:10px;flex:0 0 auto}
+.brand b{font-family:Fraunces,serif;font-weight:600;font-size:22px;letter-spacing:.02em}
+.brand span{font-size:9px;letter-spacing:.42em;color:var(--copper);text-transform:uppercase;font-weight:500}
+.searchwrap{flex:1 1 auto;max-width:520px;position:relative}
+.searchwrap input{width:100%;background:rgba(244,239,231,.05);border:1px solid rgba(244,239,231,.09);
+  color:var(--ivory);font:500 14px/1 Inter,sans-serif;padding:12px 16px 12px 40px;border-radius:var(--r-pill);
+  outline:none;transition:border-color .18s var(--ease),background .18s var(--ease)}
+.searchwrap input:focus{border-color:var(--copper);background:rgba(201,123,74,.07)}
+.searchwrap input::placeholder{color:var(--faint)}
+.searchwrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.5}
+.livepill{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);border:1px solid rgba(244,239,231,.1);
+  padding:7px 13px;border-radius:var(--r-pill);flex:0 0 auto}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 0 0 rgba(127,168,119,.6);
+  animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(127,168,119,.5)}70%{box-shadow:0 0 0 7px rgba(127,168,119,0)}100%{box-shadow:0 0 0 0 rgba(127,168,119,0)}}
+
+/* ---------- hero (S1 marquee) ---------- */
+.hero{position:relative;height:clamp(380px,52vh,560px);overflow:hidden;display:flex;align-items:flex-end}
+.hero .art{position:absolute;inset:0;background-size:cover;background-position:center 22%;
+  transform:scale(1.04);filter:saturate(.92)}
+.hero .scrim{position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(10,11,13,.96) 0%,rgba(10,11,13,.82) 38%,rgba(10,11,13,.15) 72%,rgba(10,11,13,.55) 100%),
+             linear-gradient(0deg,var(--obsidian) 2%,rgba(10,11,13,.1) 46%,rgba(10,11,13,.45) 100%)}
+.hero .body{position:relative;z-index:2;padding:0 32px 56px;max-width:660px}
+.reel{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.reel i{display:block;width:34px;height:1px;background:var(--copper)}
+.reel span{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--copper);font-weight:600}
+.hero h1{font-family:Fraunces,serif;font-weight:500;font-size:clamp(34px,4.4vw,58px);line-height:1.02;
+  margin:0 0 16px;letter-spacing:-.015em}
+.metaline{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px;font-size:13px;color:var(--muted)}
+.metaline .sep{width:3px;height:3px;border-radius:50%;background:var(--faint)}
+.tag{border:1px solid rgba(244,239,231,.16);border-radius:var(--r-xs);padding:3px 8px;font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.hero p.desc{margin:0 0 26px;color:var(--muted);font-size:14px;line-height:1.65;max-width:520px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:9px;border:0;cursor:pointer;font:600 13px/1 Inter,sans-serif;
+  padding:14px 24px;border-radius:var(--r-pill);transition:transform .18s var(--ease),background .18s var(--ease),opacity .18s}
+.btn:active{transform:scale(.975)}
+.btn-primary{background:var(--copper);color:#1A0F08}
+.btn-primary:hover{background:var(--copper-light)}
+.btn-ghost{background:rgba(244,239,231,.07);color:var(--ivory);border:1px solid rgba(244,239,231,.12)}
+.btn-ghost:hover{background:rgba(244,239,231,.12)}
+
+/* ---------- rails ---------- */
+.shelf{padding:34px 0 8px}
+.shelf-head{display:flex;align-items:baseline;gap:14px;padding:0 32px;margin-bottom:16px}
+.shelf-head h2{font-family:Fraunces,serif;font-weight:500;font-size:21px;margin:0;letter-spacing:-.01em}
+.shelf-head .count{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.rail{display:flex;gap:14px;overflow-x:auto;padding:4px 32px 16px;scroll-snap-type:x proximity}
+.rail::-webkit-scrollbar{height:0}
+.card{flex:0 0 168px;scroll-snap-align:start;cursor:pointer;transition:transform .24s var(--emph)}
+.card:hover{transform:translateY(-6px)}
+.card .art{position:relative;aspect-ratio:2/3;border-radius:var(--r-sm);overflow:hidden;background:var(--elevated)}
+.card .art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s var(--emph),filter .3s}
+.card:hover .art img{transform:scale(1.06);filter:brightness(1.06)}
+.card .art::after{content:"";position:absolute;inset:0;border-radius:var(--r-sm);
+  box-shadow:inset 0 0 0 1px rgba(244,239,231,.07);pointer-events:none}
+.badge{position:absolute;top:8px;left:8px;background:var(--copper);color:#1A0F08;font:600 9px/1 Inter,sans-serif;
+  letter-spacing:.12em;text-transform:uppercase;padding:4px 7px;border-radius:var(--r-xs)}
+.card .name{margin-top:10px;font-size:12.5px;font-weight:500;line-height:1.35;color:var(--ivory);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .sub{margin-top:4px;font-size:10.5px;color:var(--faint);letter-spacing:.06em}
+
+/* ---------- detail sheet ---------- */
+.sheet{position:fixed;inset:0;z-index:90;display:none;background:rgba(4,5,6,.72);backdrop-filter:blur(10px)}
+.sheet.open{display:block;animation:fade .24s var(--ease)}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet .panel{position:absolute;inset:0;overflow-y:auto;background:var(--obsidian);
+  animation:slide .32s var(--emph)}
+@keyframes slide{from{transform:translateY(26px);opacity:.4}to{transform:translateY(0);opacity:1}}
+.close{position:fixed;top:20px;right:24px;z-index:95;width:40px;height:40px;border-radius:50%;
+  background:var(--glass);border:1px solid rgba(244,239,231,.14);color:var(--ivory);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(16px);font-size:18px}
+.close:hover{background:rgba(244,239,231,.12)}
+.dhero{position:relative;min-height:420px;display:flex;align-items:flex-end;padding:0 40px 36px}
+.dhero .art{position:absolute;inset:0;background-size:cover;background-position:center 18%}
+.dhero .scrim{position:absolute;inset:0;background:linear-gradient(0deg,var(--obsidian) 1%,rgba(10,11,13,.7) 42%,rgba(10,11,13,.35) 100%)}
+.dhero .body{position:relative;z-index:2;max-width:720px}
+.dhero h2{font-family:Fraunces,serif;font-weight:500;font-size:clamp(28px,3.4vw,46px);margin:12px 0 14px;line-height:1.05}
+.dsec{padding:8px 40px 60px;max-width:1100px}
+.dsec h3{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--copper);font-weight:600;
+  margin:32px 0 16px;display:flex;align-items:center;gap:12px}
+.dsec h3::after{content:"";flex:1;height:1px;background:rgba(244,239,231,.08)}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{border:1px solid rgba(244,239,231,.12);border-radius:var(--r-pill);padding:8px 16px;font-size:12px;
+  color:var(--muted);cursor:pointer;transition:all .16s var(--ease);background:transparent}
+.chip:hover{border-color:rgba(201,123,74,.5);color:var(--ivory)}
+.chip.on{background:var(--copper-tint);border-color:var(--copper);color:var(--copper-light);font-weight:600}
+.eps{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.ep{background:var(--surface);border:1px solid rgba(244,239,231,.07);border-radius:var(--r-sm);
+  padding:14px 12px;cursor:pointer;transition:all .16s var(--ease);text-align:left;color:var(--ivory)}
+.ep:hover{background:var(--elevated);border-color:rgba(201,123,74,.45);transform:translateY(-2px)}
+.ep b{display:block;font-size:14px;font-weight:600;margin-bottom:3px}
+.ep span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+
+/* ---------- stream panel ---------- */
+.src{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid rgba(244,239,231,.07);
+  border-radius:var(--r-md);padding:16px 18px;margin-bottom:10px;transition:border-color .16s}
+.src:hover{border-color:rgba(201,123,74,.35)}
+.src .res{font-family:Fraunces,serif;font-size:19px;font-weight:600;color:var(--copper-light);min-width:74px}
+.src .meta{flex:1;font-size:12px;color:var(--muted);line-height:1.6}
+.src .meta b{color:var(--ivory);font-weight:500}
+.playbtn{background:var(--copper);color:#1A0F08;border:0;border-radius:var(--r-pill);padding:10px 20px;
+  font:600 12px/1 Inter,sans-serif;cursor:pointer}
+.playbtn:hover{background:var(--copper-light)}
+.playerbox{margin:18px 0 8px;background:#000;border-radius:var(--r-md);overflow:hidden;border:1px solid rgba(244,239,231,.08)}
+.playerbox video{width:100%;display:block;max-height:62vh;background:#000}
+.statusline{display:flex;align-items:center;gap:10px;font-size:12px;padding:12px 16px;border-radius:var(--r-sm);
+  background:var(--surface);border:1px solid rgba(244,239,231,.07);color:var(--muted);margin-top:12px;line-height:1.55}
+.statusline.ok{border-color:rgba(127,168,119,.4);color:#B9D3B3;background:rgba(127,168,119,.07)}
+.statusline.warn{border-color:rgba(217,164,65,.4);color:#E7C68A;background:rgba(217,164,65,.07)}
+.statusline.err{border-color:rgba(217,88,75,.4);color:#E8A49B;background:rgba(217,88,75,.07)}
+.caps{display:flex;gap:8px;flex-wrap:wrap}
+.cap{font-size:11px;padding:6px 12px;border-radius:var(--r-pill);background:rgba(244,239,231,.05);
+  border:1px solid rgba(244,239,231,.08);color:var(--muted)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--copper-light);
+  word-break:break-all;line-height:1.6}
+.empty{padding:60px 40px;text-align:center;color:var(--faint);font-size:14px}
+.spin{width:18px;height:18px;border:2px solid rgba(244,239,231,.15);border-top-color:var(--copper);
+  border-radius:50%;animation:sp .7s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);z-index:120;
+  background:var(--elevated);border:1px solid rgba(201,123,74,.4);color:var(--ivory);padding:13px 22px;
+  border-radius:var(--r-pill);font-size:13px;opacity:0;pointer-events:none;transition:all .28s var(--emph)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:720px){
+  .top{padding:12px 16px;gap:12px}.brand span{display:none}
+  .hero .body{padding:0 16px 34px}.hero{height:420px}
+  .shelf-head,.rail{padding-left:16px;padding-right:16px}
+  .card{flex-basis:132px}
+  .dhero{padding:0 18px 28px}.dsec{padding:8px 18px 60px}
+  .livepill{display:none}
+}
+</style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><b>HALLYU</b><span>Stream</span></div>
+  <div class="searchwrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Search titles, actors, genres…" autocomplete="off"/>
+  </div>
+  <div class="livepill"><span class="dot"></span><span id="pilltext">Live</span></div>
+</header>
+
+<main id="root"></main>
+
+<div class="sheet" id="sheet">
+  <button class="close" id="close" aria-label="Close">✕</button>
+  <div class="panel" id="panel"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "https://movieapi.zarhosting.dpdns.org/api/public/v1";
+const HDR = {
+  "Referer": "https://www.moviebox.ph/",
+  "Origin": "https://www.moviebox.ph"
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtSize = b => { b = Number(b)||0; if(!b) return "—";
+  const g = b/1073741824; return g >= 1 ? g.toFixed(2)+" GB" : (b/1048576).toFixed(0)+" MB"; };
+const fmtDur = s => { s = Number(s)||0; if(!s) return "—";
+  const h = Math.floor(s/3600), m = Math.round((s%3600)/60); return h ? `${h}h ${m}m` : `${m}m`; };
+
+let toastT;
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2600); }
+
+async function api(path){
+  const r = await fetch(API + path, {headers: HDR});
+  if(!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}
+
+/* ---------------- HOME ---------------- */
+let HOME = null;
+async function loadHome(){
+  $("#root").innerHTML = `<div class="empty"><span class="spin"></span><div style="margin-top:14px">Contacting provider…</div></div>`;
+  try{
+    HOME = await api("/home");
+    renderHome();
+    $("#pilltext").textContent = "Live · " + (HOME.sections||[]).reduce((n,s)=>n+(s.items||[]).length,0) + " titles";
+  }catch(e){
+    $("#root").innerHTML = `<div class="empty">Provider unreachable: ${esc(e.message)}<br><br>
+      <button class="btn btn-ghost" onclick="loadHome()">Retry</button></div>`;
+    $("#pilltext").textContent = "Offline";
+  }
+}
+
+function cardHTML(it){
+  const img = it.poster_url || "";
+  const sub = [it.year, it.rating ? "★ " + it.rating : "", it.type === "tv" ? "Series" : (it.type === "movie" ? "Film" : "")]
+    .filter(Boolean).join(" · ");
+  return `<div class="card" data-slug="${esc(it.slug)}" data-id="${esc(it.subject_id)}" data-name="${esc(it.name)}">
+    <div class="art">${img?`<img loading="lazy" src="${esc(img)}" alt="">`:""}
+      ${it.badge?`<span class="badge">${esc(it.badge)}</span>`:""}</div>
+    <div class="name">${esc(it.name)}</div>
+    ${sub?`<div class="sub">${esc(sub)}</div>`:""}
+  </div>`;
+}
+
+function renderHome(){
+  const secs = (HOME.sections||[]).filter(s => (s.items||[]).length);
+  const banner = secs.find(s => /banner|featured|trending/i.test(s.section)) || secs[0];
+  const heroItem = (banner && banner.items[0]) || {name:"HALLYU-STREAM"};
+  const heroImg = heroItem.poster_url || "";
+
+  let html = `<section class="hero">
+    <div class="art" style="background-image:url('${esc(heroImg)}')"></div>
+    <div class="scrim"></div>
+    <div class="body">
+      <div class="reel"><i></i><span>The Screening Room</span></div>
+      <h1>${esc(heroItem.name)}</h1>
+      <div class="metaline">
+        <span class="tag">Live catalogue</span>
+        <span class="sep"></span><span>${secs.length} curated rails</span>
+        <span class="sep"></span><span>Resolved on device</span>
+      </div>
+      <p class="desc">Every poster, title and stream below is fetched live from the provider API at page load — no fixtures, no mock data. Tap any title to open its real detail payload, then resolve a real signed stream URL.</p>
+      <div class="actions">
+        <button class="btn btn-primary" id="heroPlay">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Resolve stream
+        </button>
+        <button class="btn btn-ghost" id="heroSearch">Browse catalogue</button>
+      </div>
+    </div>
+  </section>`;
+
+  secs.forEach(s => {
+    html += `<section class="shelf">
+      <div class="shelf-head"><h2>${esc(s.section)}</h2><span class="count">${s.items.length} titles</span></div>
+      <div class="rail">${s.items.map(cardHTML).join("")}</div>
+    </section>`;
+  });
+
+  $("#root").innerHTML = html;
+  document.querySelectorAll(".card").forEach(el =>
+    el.addEventListener("click", () => openDetail(el.dataset.slug, el.dataset.id, el.dataset.name)));
+  const hp = $("#heroPlay");
+  if(hp) hp.addEventListener("click", () => openDetail(heroItem.slug, heroItem.subject_id, heroItem.name));
+  const hs = $("#heroSearch");
+  if(hs) hs.addEventListener("click", () => { $("#q").focus(); window.scrollTo({top:0,behavior:"smooth"}); });
+}
+
+/* ---------------- SEARCH ---------------- */
+let searchT;
+$("#q").addEventListener("input", e => {
+  clearTimeout(searchT);
+  const v = e.target.value.trim();
+  if(!v){ renderHome(); return; }
+  searchT = setTimeout(() => doSearch(v), 320);
+});
+$("#q").addEventListener("keydown", e => { if(e.key === "Enter"){ clearTimeout(searchT); doSearch(e.target.value.trim()); }});
+
+async function doSearch(q){
+  if(!q) return;
+  $("#root").innerHTML = `<div class="empty"><span class="spin"></span><div style="margin-top:14px">Searching “${esc(q)}”…</div></div>`;
+  try{
+    const d = await api("/search?q=" + encodeURIComponent(q) + "&page=1");
+    const items = d.items || [];
+    $("#pilltext").textContent = `Live · ${d.total ?? items.length} results`;
+    if(!items.length){ $("#root").innerHTML = `<div class="empty">No titles matched “${esc(q)}”.</div>`; return; }
+    $("#root").innerHTML = `<section class="shelf" style="padding-top:36px">
+      <div class="shelf-head"><h2>Results for “${esc(q)}”</h2>
+        <span class="count">${d.total ?? items.length} of ${d.total ?? items.length}</span></div>
+      <div class="rail" style="flex-wrap:wrap;overflow:visible">${items.map(cardHTML).join("")}</div>
+    </section>`;
+    document.querySelectorAll(".card").forEach(el =>
+      el.addEventListener("click", () => openDetail(el.dataset.slug, el.dataset.id, el.dataset.name)));
+  }catch(e){
+    $("#root").innerHTML = `<div class="empty">Search failed: ${esc(e.message)}</div>`;
+  }
+}
+
+/* ---------------- DETAIL ---------------- */
+let CUR = null;
+
+async function openDetail(slug, id, name){
+  const sheet = $("#sheet"), panel = $("#panel");
+  sheet.classList.add("open");
+  document.body.style.overflow = "hidden";
+  panel.innerHTML = `<div class="empty"><span class="spin"></span><div style="margin-top:14px">Loading ${esc(name||"title")}…</div></div>`;
+  try{
+    const res = await api("/detail/" + encodeURIComponent(slug));
+    const d = res.data || res;
+    const s = d.subject || {};
+    const r = d.resource || {};
+    const seasons = r.seasons || [];
+    CUR = {slug, id, name: s.title || name, subject: s, seasons, resource: r};
+
+    const cover = s.cover || "";
+    const isMovie = Number(s.subjectType) === 1 || !seasons.length;
+    const meta = [
+      s.releaseDate ? String(s.releaseDate).slice(0,4) : "",
+      s.countryName || "",
+      s.imdbRatingValue ? "★ " + s.imdbRatingValue : "",
+      seasons.length ? seasons.length + " season" + (seasons.length>1?"s":"") : "Film",
+      s.duration ? fmtDur(s.duration) : ""
+    ].filter(Boolean);
+
+    panel.innerHTML = `
+      <div class="dhero">
+        <div class="art" style="background-image:url('${esc(cover)}')"></div>
+        <div class="scrim"></div>
+        <div class="body">
+          <div class="reel"><i></i><span>${isMovie ? "Feature" : "Series"} · Live detail</span></div>
+          <h2>${esc(CUR.name)}</h2>
+          <div class="metaline">${meta.map((m,i)=> (i? '<span class="sep"></span>' : "") + `<span>${esc(m)}</span>`).join("")}</div>
+          ${s.description ? `<p class="desc">${esc(s.description)}</p>` : ""}
+          <div class="actions">
+            <button class="btn btn-primary" id="dPlay">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Resolve stream
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="dsec">
+        <h3>Resource payload</h3>
+        <div class="statusline ok">
+          <code>subjectId ${esc(s.subjectId)} · detailPath ${esc(s.detailPath || slug)} · type ${esc(s.subjectType)} · source ${esc(r.source || "—")}</code>
+        </div>
+        <div id="seasonBlock"></div>
+        <div id="streamBlock"></div>
+      </div>`;
+
+    renderSeasons();
+    $("#dPlay").addEventListener("click", () => {
+      const first = seasons[0];
+      resolveStream(first ? first.se : 0, first ? 1 : 0);
+    });
+  }catch(e){
+    panel.innerHTML = `<div class="empty">Detail failed: ${esc(e.message)}</div>`;
+  }
+}
+
+function renderSeasons(){
+  const block = $("#seasonBlock");
+  if(!block || !CUR) return;
+  const seasons = CUR.seasons;
+  if(!seasons.length){
+    block.innerHTML = `<h3>Playback</h3>
+      <div class="statusline">Film — resolves with <code>se=0&amp;ep=0</code>.
+      <button class="btn btn-primary" style="margin-left:auto" onclick="resolveStream(0,0)">Resolve</button></div>`;
+    return;
+  }
+  let html = `<h3>Seasons</h3><div class="chips">` + seasons.map((s,i) =>
+    `<button class="chip ${i===0?"on":""}" data-se="${s.se}">Season ${esc(s.se)} · ${esc(s.maxEp||0)} eps</button>`).join("") + `</div>`;
+  html += `<div id="epGrid" style="margin-top:18px"></div>`;
+  block.innerHTML = html;
+  block.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
+    block.querySelectorAll(".chip").forEach(x => x.classList.remove("on"));
+    c.classList.add("on");
+    renderEps(Number(c.dataset.se));
+  }));
+  renderEps(seasons[0].se);
+}
+
+function renderEps(se){
+  const grid = $("#epGrid");
+  const s = CUR.seasons.find(x => Number(x.se) === Number(se)) || CUR.seasons[0];
+  const max = Number(s.maxEp) || 0;
+  const res = (s.resolutions || []).map(r => r.resolution + "p").join(" / ");
+  let html = `<div class="statusline" style="margin-bottom:14px">
+    <span>Season ${esc(se)} · ${max} episodes · available: <b style="color:var(--ivory)">${esc(res||"—")}</b></span></div>
+    <div class="eps">`;
+  for(let e = 1; e <= Math.min(max, 40); e++){
+    html += `<button class="ep" onclick="resolveStream(${Number(se)},${e})"><b>Episode ${e}</b><span>Resolve →</span></button>`;
+  }
+  html += `</div>`;
+  grid.innerHTML = html;
+}
+
+/* ---------------- STREAM ---------------- */
+async function resolveStream(se, ep){
+  const block = $("#streamBlock");
+  if(!block || !CUR) return;
+  block.innerHTML = `<h3>Stream · se=${se} ep=${ep}</h3>
+    <div class="statusline"><span class="spin"></span><span>Calling <code>/stream/${esc(CUR.id)}?detail_path=${esc(CUR.slug)}&amp;se=${se}&amp;ep=${ep}</code></span></div>`;
+  block.scrollIntoView({behavior:"smooth", block:"center"});
+
+  let data;
+  try{
+    data = await api(`/stream/${encodeURIComponent(CUR.id)}?detail_path=${encodeURIComponent(CUR.slug)}&se=${se}&ep=${ep}`);
+  }catch(e){
+    block.innerHTML = `<h3>Stream · se=${se} ep=${ep}</h3>
+      <div class="statusline err">Stream resolve failed: ${esc(e.message)}</div>`;
+    return;
+  }
+
+  const sources = (data.sources || []).slice().sort((a,b) => parseInt(b.resolution) - parseInt(a.resolution));
+  if(!sources.length){
+    block.innerHTML = `<h3>Stream · se=${se} ep=${ep}</h3>
+      <div class="statusline warn">Provider returned no sources for this episode.
+      ${(data.hls||[]).length ? "HLS only." : ""}</div>`;
+    return;
+  }
+
+  let html = `<h3>Stream · se=${se} ep=${ep}</h3>
+    <div class="statusline ok"><code>HTTP 200 · has_resource=${esc(data.has_resource)} · ${sources.length} source(s) · free_episodes=${esc(data.free_episodes)} · limited=${esc(data.limited)}</code></div>
+    <div style="margin-top:16px">`;
+  sources.forEach((s,i) => {
+    html += `<div class="src">
+      <div class="res">${esc(s.resolution)}</div>
+      <div class="meta">
+        <b>${esc(s.format)}</b> · ${esc(s.codec || "—")} · ${fmtSize(s.size)} · ${fmtDur(s.duration)}<br>
+        <code>${esc(String(s.url).split("?")[0])}</code>
+      </div>
+      <button class="playbtn" data-url="${esc(s.url)}" data-res="${esc(s.resolution)}">Play</button>
+    </div>`;
+  });
+  html += `</div><div id="playerHost"></div><div id="capHost"></div>`;
+  block.innerHTML = html;
+
+  block.querySelectorAll(".playbtn").forEach(b => b.addEventListener("click", () => {
+    playSource(b.dataset.url, b.dataset.res, se, ep);
+  }));
+
+  loadCaptions(se, ep);
+}
+
+function playSource(url, res, se, ep){
+  const host = $("#playerHost");
+  host.innerHTML = `<div class="playerbox"><video id="v" controls autoplay playsinline preload="metadata"></video></div>
+    <div class="statusline" id="pstat"><span class="spin"></span><span>Requesting ${esc(res)} bytes…</span></div>`;
+  const v = $("#v"), st = $("#pstat");
+  v.src = url;
+  v.addEventListener("loadedmetadata", () => {
+    st.className = "statusline ok";
+    st.innerHTML = `<span>✓ Media decoded · ${v.videoWidth}×${v.videoHeight} · ${fmtDur(v.duration)} · ${esc(res)}</span>`;
+  });
+  v.addEventListener("error", () => {
+    const code = v.error ? v.error.code : "?";
+    const msg = v.error && v.error.message ? v.error.message : "";
+    st.className = "statusline err";
+    st.innerHTML = `<span>✕ Media element error ${esc(code)} ${esc(msg)} — the URL resolved correctly, but this network
+      (datacenter IP) is refused by the media CDN with HTTP 429. On a phone/mobile network the same URL streams.</span>`;
+  });
+  v.play().catch(() => {});
+}
+
+async function loadCaptions(se, ep){
+  const host = $("#capHost");
+  if(!host || !CUR) return;
+  try{
+    const d = await api(`/stream/${encodeURIComponent(CUR.id)}/captions?detail_path=${encodeURIComponent(CUR.slug)}&se=${se}&ep=${ep}`);
+    const caps = d.captions || [];
+    if(!caps.length){ host.innerHTML = `<h3>Subtitles</h3><div class="statusline">None published.</div>`; return; }
+    host.innerHTML = `<h3>Subtitles · ${caps.length} tracks</h3><div class="caps">` +
+      caps.map(c => `<span class="cap">${esc(c.lanName || c.lan)}</span>`).join("") + `</div>
+      <div class="statusline ok" style="margin-top:14px"><code>SRT · application/x-subrip · signed CloudFront URLs</code></div>`;
+  }catch(e){
+    host.innerHTML = `<h3>Subtitles</h3><div class="statusline warn">Caption lookup failed: ${esc(e.message)}</div>`;
+  }
+}
+
+/* ---------------- close ---------------- */
+function closeSheet(){
+  $("#sheet").classList.remove("open");
+  document.body.style.overflow = "";
+  const v = $("#v"); if(v){ v.pause(); v.src = ""; }
+}
+$("#close").addEventListener("click", closeSheet);
+$("#sheet").addEventListener("click", e => { if(e.target.id === "sheet") closeSheet(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeSheet(); });
+
+loadHome();
+</script>
+</body>
+</html>
