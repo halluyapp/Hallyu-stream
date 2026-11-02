@@ -142,3 +142,31 @@ No service-role key, DB password, or signed media URL is ever placed in client c
 - `apps/preview` never renders a fake “paired” state or a fake successful stream. If the provider or pairing API is unreachable, it shows the designed error/empty state with Retry.
 - Downloads in the browser preview are explicitly labelled “device-only”; no false “complete” state exists (`05` §6, `15.2` #12).
 - The About copy carries the independence disclaimer required by `09-SECURITY_AND_PRIVACY.md` and Appendix A.
+
+---
+
+## One Android build, one place to download it (2026-11-02)
+
+This repository briefly contained **two different Android workflows** from two different builds:
+
+- `main`'s `.github/workflows/android.yml` — “Build Android APK”, building the earlier `mobile/` Expo app.
+- `.github/workflows/build-apk.yml` — “Build Android APKs”, building the full `apps/mobile` phone client **and** the separate `apps/tv` Android TV client, with shared packages, strict checks and signed debug/release outputs.
+
+That split is why the Actions list looked contradictory. It is now consolidated:
+
+- `build-apk.yml` is the only Android workflow. The earlier `mobile/` tree and `android.yml` are removed.
+- Pushes to `main`, pushes to this branch, `v*` tags, PRs targeting `main`, and manual dispatch all run the same phone + TV build.
+- A `v*` tag attaches the built APKs to a **GitHub Release** as direct `.apk` assets. Use the Release page rather than the zipped Actions artifacts; GitHub artifact blob downloads are blocked from some networks (including this sandbox), which can look like a broken/failed download even when the run is green.
+
+### Verified green runs
+
+| Run | Commit | Result |
+|---|---|---|
+| [41509904497](https://github.com/halluyapp/hallyu-stream/actions/runs/41509904497) | `68f2f75` | first full green phone + TV build |
+| [41514853664](https://github.com/halluyapp/hallyu-stream/actions/runs/41514853664) | `ca03757` | clean re-run: `verify`, `build-mobile-apk`, `build-tv-apk` all passed |
+
+The three red runs earlier in this workflow’s history are superseded iterations (Kotlin alignment, Jetifier memory, RN module pins, `expo-asset`); each was fixed in the next commit. They are not the current build.
+
+### APK downloads
+
+Open the repository’s **Releases** page and download the phone and TV `.apk` assets from `v0.1.0`. These are CI-signed builds for testing, not store-ready releases; hardware installation/playback and a persistent production keystore are still required before distribution.
