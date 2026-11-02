@@ -14,7 +14,7 @@
     "@expo-google-fonts/inter": "^0.2.3",
     "@hallyu/shared": "file:../../packages/shared",
     "@hallyu/ui": "file:../../packages/ui",
-    "@react-native-async-storage/async-storage": "^2.1.0",
+    "@react-native-async-storage/async-storage": "2.1.0",
     "expo": "~52.0.0",
     "expo-camera": "~16.0.0",
     "expo-file-system": "~18.0.0",
@@ -22,12 +22,12 @@
     "expo-haptics": "~14.0.0",
     "expo-secure-store": "~14.0.0",
     "expo-status-bar": "~2.0.0",
-    "lucide-react-native": "^0.468.0",
+    "lucide-react-native": "0.468.0",
     "react": "18.3.1",
     "react-native": "0.76.5",
-    "react-native-qrcode-svg": "^6.3.0",
-    "react-native-svg": "^15.8.0",
-    "react-native-video": "^6.9.0"
+    "react-native-qrcode-svg": "6.3.0",
+    "react-native-svg": "15.8.0",
+    "react-native-video": "6.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
