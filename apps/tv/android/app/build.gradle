@@ -1,0 +1,52 @@
+apply plugin: "com.android.application"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "com.facebook.react"
+
+react {
+  root = file("../../")
+  reactNativeDir = file("../../node_modules/react-native")
+  codegenDir = file("../../node_modules/@react-native/codegen")
+  cliFile = file("../../node_modules/react-native/cli.js")
+  hermesCommand = "../../node_modules/react-native/sdks/hermesc/%OS-BIN%/hermesc"
+}
+
+def enableProguardInReleaseBuilds = false
+def jscFlavor = 'org.webkit:android-jsc:+'
+
+android {
+  namespace "com.hallyu.stream.tv"
+  compileSdk rootProject.ext.compileSdkVersion
+  buildToolsVersion rootProject.ext.buildToolsVersion
+
+  defaultConfig {
+    applicationId "com.hallyu.stream.tv"
+    minSdkVersion rootProject.ext.minSdkVersion
+    targetSdkVersion rootProject.ext.targetSdkVersion
+    versionCode 1
+    versionName "0.1.0"
+  }
+
+  buildTypes {
+    debug {
+      // No debug keystore is committed. Android Studio generates one for local builds.
+    }
+    release {
+      minifyEnabled enableProguardInReleaseBuilds
+      proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+    }
+  }
+}
+
+dependencies {
+  implementation("com.facebook.react:react-android")
+  implementation("androidx.appcompat:appcompat:1.6.1")
+  implementation("androidx.core:core-ktx:1.13.1")
+
+  if (hermesEnabled.toBoolean()) {
+    implementation("com.facebook.react:hermes-android")
+  } else {
+    implementation jscFlavor
+  }
+}
+
+apply from: file("../../node_modules/@react-native/gradle-plugin/autolinking.gradle")
