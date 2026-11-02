@@ -1,0 +1,13 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@hallyu/shared": ["../../packages/shared/src"],
+      "@hallyu/ui": ["../../packages/ui/src"]
+    }
+  },
+  "include": ["src/**/*", "index.js"]
+}

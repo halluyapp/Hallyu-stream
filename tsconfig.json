@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@hallyu/shared": ["packages/shared/src"],
+      "@hallyu/shared/*": ["packages/shared/src/*"],
+      "@hallyu/ui": ["packages/ui/src"],
+      "@hallyu/ui/*": ["packages/ui/src/*"]
+    }
+  },
+  "include": [
+    "packages/shared/src/**/*",
+    "packages/ui/src/**/*",
+    "apps/preview/src/**/*",
+    "apps/preview/vite.config.ts"
+  ],
+  "exclude": ["node_modules", "dist", "build", "supabase/functions"]
+}

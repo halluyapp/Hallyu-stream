@@ -1,0 +1,5 @@
+# Replace <project-ref> with the new Supabase project's ref after creation.
+project_id = "hallyu-stream-pairing"
+
+[functions.pairing-api]
+verify_jwt = false
