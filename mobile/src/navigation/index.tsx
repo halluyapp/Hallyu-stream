@@ -31,7 +31,7 @@ export type RootStackParamList = {
   };
   Downloads: undefined;
   PairingHub: undefined;
-  PairingCode: {challengeId?: string} | undefined;
+  PairingCode: {challengeId?: string; code?: string} | undefined;
   PairingScan: undefined;
   Devices: undefined;
 };

@@ -1,108 +1,84 @@
-import React, {useCallback, useRef, useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {Pressable, Text, TextInput, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Camera, Code, useCameraDevice, useCameraPermission} from 'react-native-vision-camera';
-import {parseQrPayload} from '../../api/pairing';
 import {useTheme} from '../../theme';
 import {Button, Icon} from '../../components/ui';
 
 /**
- * Phone-side QR capture. The QR carries a challenge id only — never a token, never a
- * media URL — so a photograph of the screen leaks nothing useful.
+ * Phone-side pairing entry.
+ *
+ * This used to be a QR scanner built on react-native-vision-camera. That module
+ * needs react-native-worklets-core plus a native C++ build to be present; when
+ * it is not, the screen throws the moment it mounts. Manual code entry needs no
+ * camera permission, no native surface and no extra native code, and the
+ * pairing protocol already accepts a 6-character code — so the QR was a
+ * convenience, never a requirement.
+ *
+ * The TV shows a code; the user types it here; the TV polls and receives the
+ * one-time credential. Nothing about the security model changes.
  */
 export default function PairingScanScreen({navigation}: any) {
   const {c, t, s, r} = useTheme();
   const insets = useSafeAreaInsets();
-  const {hasPermission, requestPermission} = useCameraPermission();
-  const device = useCameraDevice('back');
-  const [handled, setHandled] = useState(false);
-  const lock = useRef(false);
+  const [code, setCode] = useState('');
 
-  const onCodeScanned = useCallback(
-    (codes: Code[]) => {
-      if (lock.current) {
-        return;
-      }
-      const value = codes.find(x => x.value)?.value;
-      if (!value) {
-        return;
-      }
-      const challengeId = parseQrPayload(value);
-      if (!challengeId) {
-        return;
-      }
-      lock.current = true;
-      setHandled(true);
-      navigation.replace('PairingCode', {challengeId});
-    },
-    [navigation],
-  );
+  const clean = code.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 6);
+  const ready = clean.length === 6;
 
-  if (!hasPermission) {
-    return (
-      <View style={{flex: 1, backgroundColor: c.obsidian, paddingTop: insets.top, padding: s.gutter}}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Go back">
-          <Icon name="back" size={22} color={c.ivory} />
-        </Pressable>
-        <View style={{flex: 1, justifyContent: 'center'}}>
-          <Text style={[t.displayMd, {color: c.ivory}]}>Camera access</Text>
-          <Text style={[t.bodyMd, {color: c.muted, marginTop: s.xs}]}>
-            The scanner needs the camera to read the code on your television. Nothing is recorded
-            or uploaded.
-          </Text>
-          <View style={{marginTop: s.lg}}>
-            <Button label="Allow camera" icon="qr" onPress={() => requestPermission()} />
-          </View>
-          <View style={{marginTop: s.sm}}>
-            <Button label="Type the code instead" variant="ghost" onPress={() => navigation.replace('PairingCode')} />
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  if (!device) {
-    return (
-      <View style={{flex: 1, backgroundColor: c.obsidian, justifyContent: 'center', padding: s.gutter}}>
-        <Text style={[t.bodyMd, {color: c.muted}]}>No camera on this device. Type the code instead.</Text>
-        <View style={{marginTop: s.md}}>
-          <Button label="Enter code" onPress={() => navigation.replace('PairingCode')} />
-        </View>
-      </View>
-    );
-  }
+  const submit = () => {
+    if (ready) {
+      navigation.replace('PairingCode', {challengeId: undefined, code: clean});
+    }
+  };
 
   return (
-    <View style={{flex: 1, backgroundColor: '#000'}}>
-      <Camera
-        style={StyleSheet.absoluteFill}
-        device={device}
-        isActive={!handled}
-        codeScanner={{codeTypes: ['qr'], onCodeScanned}}
-      />
-      <View style={[StyleSheet.absoluteFill, {backgroundColor: 'rgba(0,0,0,0.35)'}]} pointerEvents="none" />
-      <View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          top: '28%',
-          left: '12%',
-          right: '12%',
-          aspectRatio: 1,
-          borderWidth: 2,
-          borderColor: c.copper,
-          borderRadius: r.lg,
-        }}
-      />
-      <View style={{position: 'absolute', top: insets.top + s.sm, left: s.gutter, right: s.gutter}}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Close scanner">
-          <Icon name="close" size={24} color={c.ivory} />
-        </Pressable>
-        <Text style={[t.titleMd, {color: c.ivory, marginTop: s.md}]}>Point at the code on your TV</Text>
-        <Text style={[t.bodySm, {color: c.muted, marginTop: 4}]}>It sits under the six-character code.</Text>
-      </View>
-      <View style={{position: 'absolute', bottom: insets.bottom + s.xl, left: s.gutter, right: s.gutter}}>
-        <Button label="Type the code instead" variant="secondary" onPress={() => navigation.replace('PairingCode')} full />
+    <View style={{flex: 1, backgroundColor: c.obsidian, paddingTop: insets.top, padding: s.gutter}}>
+      <Pressable onPress={() => navigation.goBack()} hitSlop={12} accessibilityLabel="Go back">
+        <Icon name="back" size={22} color={c.ivory} />
+      </Pressable>
+
+      <View style={{flex: 1, justifyContent: 'center'}}>
+        <Text style={[t.reel, {color: c.copper}]}>PAIR A TELEVISION</Text>
+        <Text style={[t.displayMd, {color: c.ivory, marginTop: s.xs}]}>Enter the code</Text>
+        <Text style={[t.bodyMd, {color: c.muted, marginTop: s.xs}]}>
+          Your television shows a six-character code on its activation screen. Type it here and the
+          TV picks up your session on its next poll.
+        </Text>
+
+        <TextInput
+          value={clean}
+          onChangeText={setCode}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          autoFocus
+          maxLength={6}
+          placeholder="ABC123"
+          placeholderTextColor={c.faint}
+          returnKeyType="go"
+          onSubmitEditing={submit}
+          style={{
+            marginTop: s.lg,
+            backgroundColor: c.surface,
+            borderWidth: 1,
+            borderColor: ready ? c.copper : c.hairline,
+            borderRadius: r.md,
+            paddingVertical: s.md,
+            paddingHorizontal: s.md,
+            color: c.ivory,
+            fontSize: 30,
+            letterSpacing: 12,
+            textAlign: 'center',
+            fontFamily: 'Inter_600SemiBold',
+          }}
+        />
+
+        <View style={{marginTop: s.lg}}>
+          <Button label="Continue" icon="check" disabled={!ready} onPress={submit} />
+        </View>
+
+        <Text style={[t.micro, {color: c.faint, marginTop: s.md, textAlign: 'center'}]}>
+          The code expires after ten minutes and can only be used once.
+        </Text>
       </View>
     </View>
   );

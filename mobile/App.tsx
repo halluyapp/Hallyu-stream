@@ -13,6 +13,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {ThemeProvider, C} from './src/theme';
 import {AppProvider} from './src/state/store';
 import {detectFormFactor} from './src/core/platform';
+import {ErrorBoundary} from './src/core/ErrorBoundary';
 import {MobileNavigator} from './src/navigation';
 import TvNavigator from './src/screens/tv/TvApp';
 
@@ -28,9 +29,11 @@ export default function App(): React.JSX.Element {
             backgroundColor={isTv ? C.obsidian : 'transparent'}
             translucent={!isTv}
           />
-          <AppProvider>
-            {isTv ? <TvNavigator /> : <MobileNavigator />}
-          </AppProvider>
+          <ErrorBoundary>
+            <AppProvider>
+              {isTv ? <TvNavigator /> : <MobileNavigator />}
+            </AppProvider>
+          </ErrorBoundary>
         </View>
       </ThemeProvider>
     </SafeAreaProvider>

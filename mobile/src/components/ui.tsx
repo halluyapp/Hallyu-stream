@@ -2,6 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import {
   ActivityIndicator,
   Animated,
+  FlatList,
   Image,
   Pressable,
   ScrollView,
@@ -214,7 +215,16 @@ export function PosterCard({
           borderColor: focused ? c.copper : c.hairline,
         }}>
         {title.poster ? (
-          <Image source={{uri: title.poster}} style={StyleSheet.absoluteFill} resizeMode="cover" />
+          <Image
+            source={{uri: title.poster}}
+            style={StyleSheet.absoluteFill}
+            resizeMode="cover"
+            /* Android: decode at the view's size, not the source's full
+               resolution. Without this Fresco allocates a full-size bitmap per
+               card and a few hundred cards exhaust the heap. */
+            resizeMethod="resize"
+            fadeDuration={180}
+          />
         ) : (
           <View style={[StyleSheet.absoluteFill, styles.center]}>
             <Icon name="play" size={24} color={c.faint} />
@@ -268,20 +278,29 @@ export function Rail({
       <View style={{paddingHorizontal: horizontalPadding, marginBottom: s.sm}}>
         <ReelLabel>{sectionTitle}</ReelLabel>
       </View>
-      <ScrollView
+      {/* Virtualised: only the first few cards mount, the rest stream in as the
+          user scrolls. A plain ScrollView + map mounted every card in every
+          rail at once (378 cards on the live catalogue) which is what made the
+          app slow and eventually OOM. */}
+      <FlatList
         horizontal
+        data={items}
+        keyExtractor={item => `${item.subjectId}-${item.detailPath}`}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{paddingHorizontal: horizontalPadding}}
-        removeClippedSubviews>
-        {items.map(item => (
+        removeClippedSubviews
+        initialNumToRender={4}
+        maxToRenderPerBatch={4}
+        updateCellsBatchingPeriod={60}
+        windowSize={3}
+        renderItem={({item}) => (
           <PosterCard
-            key={`${item.subjectId}-${item.detailPath}`}
             title={item}
             onPress={() => onPressItem(item)}
             progress={progressFor?.(item)}
           />
-        ))}
-      </ScrollView>
+        )}
+      />
     </View>
   );
 }
@@ -308,7 +327,13 @@ export function Hero({
   return (
     <View style={{height: h, justifyContent: 'flex-end'}}>
       {backdrop ? (
-        <Image source={{uri: backdrop}} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        <Image
+          source={{uri: backdrop}}
+          style={StyleSheet.absoluteFill}
+          resizeMode="cover"
+          resizeMethod="resize"
+          fadeDuration={220}
+        />
       ) : (
         <View style={[StyleSheet.absoluteFill, {backgroundColor: c.elevated}]} />
       )}

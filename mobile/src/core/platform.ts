@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Dimensions, Platform} from 'react-native';
+import {Platform} from 'react-native';
 
 /* ------------------------- device detection ------------------------ */
 
@@ -12,11 +12,17 @@ import {Dimensions, Platform} from 'react-native';
  * touch input as a television so sideloaded boxes behave correctly.
  */
 export function detectFormFactor(): {isTv: boolean; isLowTier: boolean} {
-  const {width, height} = Dimensions.get('screen');
-  const shortEdge = Math.min(width, height);
-  const longEdge = Math.max(width, height);
-  const looksLikeTv = shortEdge >= 540 && longEdge / shortEdge > 1.5 && width > height;
-  const isTv = Platform.isTV === true || (Platform.OS === 'android' && looksLikeTv);
+  /**
+   * Android sets `Platform.isTV` from UiModeManager, which the TV launcher
+   * populates. That is the only trustworthy signal.
+   *
+   * A geometry heuristic used to live here as a fallback for sideloaded boxes,
+   * but it matched any phone in landscape (1080x2400 satisfies "short edge >=
+   * 540 and aspect > 1.5"), so rotating a phone mounted the ten-foot UI. That
+   * looked like the app breaking. Geometry is gone; if a device really is a TV
+   * without the flag, it can be forced from Settings.
+   */
+  const isTv = Platform.isTV === true;
   return {isTv, isLowTier: false};
 }
 

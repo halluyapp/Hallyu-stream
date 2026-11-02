@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
-import {RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {FlatList, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {api, Title} from '../../api/provider';
 import {useAsync} from '../../core/hooks';
@@ -54,19 +54,15 @@ export default function HomeScreen({navigation}: any) {
     );
   }
 
-  return (
-    <ScrollView
-      style={{flex: 1, backgroundColor: c.obsidian}}
-      contentContainerStyle={{paddingBottom: s.xxl}}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={() => reload()}
-          tintColor={c.copper}
-          colors={[c.copper]}
-          progressBackgroundColor={c.elevated}
-        />
-      }>
+  /**
+   * Header = brand row + hero + "continue watching".
+   *
+   * It lives in ListHeaderComponent rather than above the list so the whole
+   * screen is one virtualised FlatList. Nesting a FlatList inside a ScrollView
+   * would disable windowing and we would be back to mounting every rail.
+   */
+  const header = (
+    <>
       <View style={pad}>
         <View style={styles.brandRow}>
           <View>
@@ -103,7 +99,10 @@ export default function HomeScreen({navigation}: any) {
           <View style={{paddingHorizontal: s.gutter, marginBottom: s.sm}}>
             <ReelLabel>Continue watching</ReelLabel>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: s.gutter}}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingHorizontal: s.gutter}}>
             {resume.slice(0, 10).map(p => (
               <View key={p.subjectId} style={{width: 220, marginRight: s.sm}}>
                 <View
@@ -146,10 +145,43 @@ export default function HomeScreen({navigation}: any) {
           onAction={() => reload()}
         />
       ) : null}
+    </>
+  );
 
-      {data?.map(section => (
+  const footer =
+    data && data.length > 0 ? (
+      <Text style={[t.micro, {color: c.faint, textAlign: 'center', marginTop: s.md}]}>
+        {data.reduce((n, sec) => n + sec.items.length, 0)} titles across {data.length} shelves
+      </Text>
+    ) : null;
+
+  return (
+    <FlatList
+      style={{flex: 1, backgroundColor: c.obsidian}}
+      contentContainerStyle={{paddingBottom: s.xxl}}
+      data={data ?? []}
+      keyExtractor={section => section.key}
+      ListHeaderComponent={header}
+      ListFooterComponent={footer}
+      /* Only a few rails are mounted at a time; the rest mount as they scroll
+         into the window. This is what keeps peak memory flat on a 378-title
+         catalogue instead of allocating every poster bitmap at launch. */
+      initialNumToRender={2}
+      maxToRenderPerBatch={2}
+      updateCellsBatchingPeriod={80}
+      windowSize={3}
+      removeClippedSubviews
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => reload()}
+          tintColor={c.copper}
+          colors={[c.copper]}
+          progressBackgroundColor={c.elevated}
+        />
+      }
+      renderItem={({item: section}) => (
         <Rail
-          key={section.key}
           sectionTitle={section.title}
           items={section.items}
           onPressItem={openDetail}
@@ -162,14 +194,8 @@ export default function HomeScreen({navigation}: any) {
           }}
           horizontalPadding={s.gutter}
         />
-      ))}
-
-      {data && data.length > 0 ? (
-        <Text style={[t.micro, {color: c.faint, textAlign: 'center', marginTop: s.md}]}>
-          {data.reduce((n, sec) => n + sec.items.length, 0)} titles across {data.length} shelves
-        </Text>
-      ) : null}
-    </ScrollView>
+      )}
+    />
   );
 }
 

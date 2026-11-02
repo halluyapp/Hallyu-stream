@@ -66,7 +66,9 @@ export function PairingCodeScreen({navigation, route}: any) {
   const {c, t, s, r} = useTheme();
   const insets = useSafeAreaInsets();
   const {settings, deviceToken, setDeviceToken, showToast} = useApp();
-  const [raw, setRaw] = useState('');
+  // The scan screen hands its six characters over as a route param so the user
+  // does not have to type them twice.
+  const [raw, setRaw] = useState<string>(() => String(route?.params?.code ?? ''));
   const [busy, setBusy] = useState(false);
   const [found, setFound] = useState<{challengeId: string; deviceName: string; expiresAt: string} | null>(null);
   const [error, setError] = useState<string | null>(null);

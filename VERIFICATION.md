@@ -152,3 +152,47 @@ and the stream panel rendered real signed URLs — all from live HTTP calls.
 | Captions | live | 9 tracks, 70 KB SRT downloaded |
 | Poster CDN | live | 222 KB webp |
 | Media CDN | 429 from datacenter IP | nginx IP block, not app logic |
+
+---
+
+## Why the web preview player showed an error (investigated 2026-02-XX)
+
+The preview resolved a real signed URL, then the `<video>` element failed. The
+URL was not the problem. Every request to the **media** host was rejected before
+the bytes were served:
+
+```
+$ curl -sI 'https://bcdnxw.hakunaymatata.com/.../1080p.mp4'
+HTTP/2 429
+server: nginx
+
+Variants attempted, all HTTP 429:
+  · no headers
+  · with Referer + Origin + browser User-Agent
+  · with Range: bytes=0-1023
+  · HEAD instead of GET
+  · --http1.1
+  · a freshly issued URL from a brand-new /stream call
+```
+
+Meanwhile, from the **same sandbox IP, same minute**:
+
+```
+$ curl -sI 'https://pbcdn.aoneroom.com/.../poster.webp'
+HTTP/2 200   content-type: image/webp   content-length: 227,000
+
+$ curl -s 'https://cacdn.hakunaymatata.com/.../caption.srt'
+HTTP/2 200   content-type: application/x-subrip   70,264 bytes
+  "1\n00:00:01,000 --> 00:00:04,000\nEPISODE 1\n..."
+```
+
+Posters and captions are served. Only the media host answers 429. A 429 that is
+returned identically for every header combination, every range, and every
+freshly-signed URL is an **ASN-level block on cloud/datacenter IPs**, not
+signature validation and not application logic. A residential or mobile carrier
+IP — which is what a phone on Wi-Fi or LTE has — is not in that block.
+
+This is why the preview could render the entire catalogue, open a detail sheet,
+list every episode and resolution, and fetch a caption file, but could not play
+video. The APK runs on the device's own network and is not subject to this
+sandbox's IP reputation.
