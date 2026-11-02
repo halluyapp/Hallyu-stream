@@ -18,6 +18,9 @@ on:
         required: false
         default: '1.0.0'
 
+permissions:
+  contents: write
+
 concurrency:
   group: android-${{ github.ref }}
   cancel-in-progress: true
