@@ -12,6 +12,15 @@
 
 Tag pushes matching `v*` additionally attach the built APKs to a GitHub Release as direct `.apk` assets. Prefer those Release assets over the zipped Actions artifacts: artifact blob downloads can be blocked by network egress rules even when the run is green.
 
+The two build jobs deliberately rename their outputs before upload:
+
+```text
+hallyu-stream-phone-debug.apk    hallyu-stream-phone-release.apk
+hallyu-stream-tv-debug.apk       hallyu-stream-tv-release.apk
+```
+
+Both Gradle projects otherwise produce `app-debug.apk` / `app-release.apk`; with `merge-multiple: true` in the release job those identical names would overwrite each other and only one client's APKs would reach the Release.
+
 ## What each job does
 
 | Job | Command highlights | Output artifact |
