@@ -4,6 +4,7 @@ name: Build Android APKs
   push:
     branches:
       - arena/69ba68a7-hallyu-stream
+      - main
     tags:
       - 'v*'
   pull_request:
