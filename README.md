@@ -131,7 +131,7 @@ No service-role key, DB password, or signed media URL is ever placed in client c
 
 ### Verified vs assumed
 
-- **Verified:** repository contents, tooling availability, Supabase org/project list, free-limit refusal, TypeScript strictness of the shared layer, preview production build, offline smoke test, local validation of the GitHub Actions workflow YAML, and a successful GitHub Actions run that built and uploaded phone + TV debug/release APK artifacts ([run 41509904497](https://github.com/halluyapp/hallyu-stream/actions/runs/41509904497)).
+- **Verified:** repository contents, tooling availability, Supabase org/project list, free-limit refusal, TypeScript strictness of the shared layer, preview production build, offline smoke test, local validation of the GitHub Actions workflow YAML, successful GitHub Actions runs that built and uploaded phone + TV debug/release APK artifacts ([run 41509904497](https://github.com/halluyapp/hallyu-stream/actions/runs/41509904497), [run 41514853664](https://github.com/halluyapp/hallyu-stream/actions/runs/41514853664)), and a published [v0.1.1 Release](https://github.com/halluyapp/hallyu-stream/releases/tag/v0.1.1) with four direct `.apk` assets.
 - **Assumed / unverified:** live `zarhosting` response shapes (normalisers are defensive), live CDN playback, physical low-RAM phone behaviour, Android TV focus on hardware, QR camera permission flow on device, and installation/playback of the CI APKs on real hardware. The spec’s own Appendix D lists hardware items as open.
 - **Not claimed:** real playback, successful pairing, provider smoke test from this sandbox (outbound network here is restricted to package registries/GitHub), or store-ready production signing. APK artifacts exist but have not been exercised on a physical device.
 
@@ -160,13 +160,23 @@ That split is why the Actions list looked contradictory. It is now consolidated:
 
 ### Verified green runs
 
-| Run | Commit | Result |
+| Run | Commit / ref | Result |
 |---|---|---|
 | [41509904497](https://github.com/halluyapp/hallyu-stream/actions/runs/41509904497) | `68f2f75` | first full green phone + TV build |
 | [41514853664](https://github.com/halluyapp/hallyu-stream/actions/runs/41514853664) | `ca03757` | clean re-run: `verify`, `build-mobile-apk`, `build-tv-apk` all passed |
+| [41521621257](https://github.com/halluyapp/hallyu-stream/actions/runs/41521621257) | `publish-apks` | attached the four corrected APK assets to the `v0.1.1` Release |
 
-The three red runs earlier in this workflow’s history are superseded iterations (Kotlin alignment, Jetifier memory, RN module pins, `expo-asset`); each was fixed in the next commit. They are not the current build.
+The three red runs earlier in this workflow’s history are superseded iterations (Kotlin alignment, Jetifier memory, RN module pins, `expo-asset`); each was fixed in the next commit. They are not the current build. The incomplete `v0.1.0` release/tag was removed.
 
-### APK downloads
+### APK downloads — use `v0.1.1`
 
-Open the repository’s **Releases** page and download the phone and TV `.apk` assets from `v0.1.0`. These are CI-signed builds for testing, not store-ready releases; hardware installation/playback and a persistent production keystore are still required before distribution.
+Direct assets on the [v0.1.1 Release page](https://github.com/halluyapp/hallyu-stream/releases/tag/v0.1.1):
+
+| Asset | Size | Direct link |
+|---|---:|---|
+| `hallyu-stream-phone-debug.apk` | 149,492,230 bytes | [download](https://github.com/halluyapp/hallyu-stream/releases/download/v0.1.1/hallyu-stream-phone-debug.apk) |
+| `hallyu-stream-phone-release.apk` | 88,363,807 bytes | [download](https://github.com/halluyapp/hallyu-stream/releases/download/v0.1.1/hallyu-stream-phone-release.apk) |
+| `hallyu-stream-tv-debug.apk` | 114,316,091 bytes | [download](https://github.com/halluyapp/hallyu-stream/releases/download/v0.1.1/hallyu-stream-tv-debug.apk) |
+| `hallyu-stream-tv-release.apk` | 53,903,665 bytes | [download](https://github.com/halluyapp/hallyu-stream/releases/download/v0.1.1/hallyu-stream-tv-release.apk) |
+
+Use these Release assets rather than the zipped Actions artifacts. These are CI-signed builds for testing, not store-ready releases; hardware installation/playback and a persistent production keystore are still required before distribution.
