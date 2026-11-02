@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Media and provider traffic is HTTPS only. Cleartext is permitted solely so a
+  pairing backend running on the local network (http://192.168.x.x:8787 or the
+  emulator host 10.0.2.2) can be reached during development and self-hosting.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
