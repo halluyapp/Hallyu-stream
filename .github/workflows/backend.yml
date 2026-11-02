@@ -1,0 +1,68 @@
+name: Backend — test & image
+
+on:
+  push:
+    branches:
+      - arena/caa2ca6a-hallyu-stream
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: node:test (Node 22)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+
+  smoke:
+    name: Boot & probe
+    needs: test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Start service and hit /health
+        run: |
+          DATABASE_PATH=/tmp/pairing.db PORT=8787 node src/server.js &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8787/health > /tmp/health.json; then break; fi
+            sleep 1
+          done
+          cat /tmp/health.json
+          grep -q '"mediaProxy":false' /tmp/health.json
+          # The service must never expose media bytes.
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8787/stream/anything)
+          test "$code" = "404"
+
+  image:
+    name: Docker image
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: docker build -t hallyu-stream-pairing:${{ github.sha }} backend
