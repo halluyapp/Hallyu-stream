@@ -20,12 +20,12 @@ export default function LibraryScreen({navigation}: any) {
       <View style={{paddingHorizontal: s.gutter}}>
         <Text style={[t.displayMd, {color: c.ivory}]}>Library</Text>
         <Text style={[t.bodySm, {color: c.muted, marginTop: 2}]}>
-          {library.length} saved · {downloads.length} in the offline queue
+          {library.length} saved · {downloads.length} resolved
         </Text>
       </View>
 
       <View style={{flexDirection: 'row', gap: s.sm, paddingHorizontal: s.gutter, marginTop: s.md}}>
-        <Button label="Downloads" icon="download" variant="secondary" onPress={() => navigation.navigate('Downloads')} />
+        <Button label="Resolved sources" icon="download" variant="secondary" onPress={() => navigation.navigate('Downloads')} />
         <Button label="Devices" icon="tv" variant="secondary" onPress={() => navigation.navigate('PairingHub')} />
       </View>
 

@@ -145,7 +145,7 @@ export default function DetailScreen({route, navigation}: any) {
             }}
           />
           <Button
-            label="Download"
+            label="Prepare"
             icon="download"
             variant="secondary"
             onPress={() =>

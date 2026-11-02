@@ -33,7 +33,7 @@ export default function DownloadsScreen({route, navigation}: any) {
       });
       const source = selectSource(info, {preferred: settings.preferredQuality, isTv: device.isTv, fallbackToAny: true});
       if (!source) {
-        showToast('No downloadable source for this episode.');
+        showToast('No playable source for this episode.');
         return;
       }
       setDownload({
@@ -50,7 +50,7 @@ export default function DownloadsScreen({route, navigation}: any) {
         bytes: source.sizeBytes,
         createdAt: Date.now(),
       });
-      showToast(`${source.quality} copy queued`);
+      showToast(`${source.quality} source resolved`);
     } catch (e: any) {
       showToast(e?.message ?? 'Could not prepare this episode.');
     } finally {
@@ -85,20 +85,21 @@ export default function DownloadsScreen({route, navigation}: any) {
 
       <View style={{paddingHorizontal: s.gutter, marginTop: s.md}}>
         <Text style={[t.micro, {color: c.faint}]}>
-          Sources are resolved on this device. Playback streams from the CDN with the provider's
-          signed URL; expired links are re-resolved automatically when you press play.
+          These are resolved sources, not stored files. Nothing is written to the device: the
+          provider's CDN does not permit this app to copy its bytes, so pressing play re-resolves a
+          fresh signed URL and streams it. Entries stay useful only while you are online.
         </Text>
       </View>
 
       <View style={{paddingHorizontal: s.gutter, marginTop: s.lg}}>
-        <ReelLabel>Offline queue</ReelLabel>
+        <ReelLabel>Resolved sources</ReelLabel>
       </View>
 
       {downloads.length === 0 ? (
         <EmptyState
           icon="download"
-          headline="Nothing queued"
-          body="Open a title and tap Download to prepare a copy for this device."
+          headline="Nothing resolved"
+          body="Open a title and tap Prepare to resolve a playable source for it."
           actionLabel="Browse"
           onAction={() => navigation.navigate('Tabs')}
         />
